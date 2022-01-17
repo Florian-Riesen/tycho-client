@@ -6,6 +6,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Plugin.NFC;
+using Android.Content;
 
 namespace TychoClient.Droid
 {
@@ -17,9 +19,28 @@ namespace TychoClient.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
+            // Plugin NFC: Initialization
+            CrossNFC.Init(this);
+
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            // Plugin NFC: Restart NFC listening on resume (needed for Android 10+) 
+            CrossNFC.OnResume();
+        }
+
+        protected override void OnNewIntent(Intent intent)
+        {
+            base.OnNewIntent(intent);
+
+            // Plugin NFC: Tag Discovery Interception
+            CrossNFC.OnNewIntent(intent);
         }
     }
 }
