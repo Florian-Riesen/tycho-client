@@ -39,9 +39,8 @@ namespace TychoClient.ViewModels
             });
             
 
-            ReadTagCommand = new Command(ReadTag);
+            ReadTagCommand = new Command(ReadAndWriteTag);
             IncrementValueCommand = new Command(LogSomeData);
-            WriteToTagCommand = new Command(WriteToTag);
         }
 
         private void _nfc_OnMessageReceived(ITagInfo tagInfo)
@@ -51,13 +50,7 @@ namespace TychoClient.ViewModels
             SomeData += Newtonsoft.Json.JsonConvert.SerializeObject(tagInfo);
             _lastReadKeyContent = tagInfo;
             SomeData += $"TagInfo type: {tagInfo.GetType().Name}";
-
-            WriteToTag();
-
-            //Device.BeginInvokeOnMainThread(() =>
-            //{
-            //    _nfc.OnMessageReceived -= _nfc_OnMessageReceived;
-            //});
+            
         }
 
         private void _nfc_OnTagListeningStatusChanged(bool isListening)
@@ -68,8 +61,7 @@ namespace TychoClient.ViewModels
 
         private void _nfc_OnNfcStatusChanged(bool isEnabled)
         {
-            SomeData += "NFC STATUS CHANGED!";
-            _nfc.StopListening();
+            SomeData += "NFC status changed!";
         }
 
         private void Current_OnTagConnected(object sender, EventArgs e)
@@ -85,7 +77,6 @@ namespace TychoClient.ViewModels
             _lastReadKeyContent = tagInfo;
             LogSomeData();
 
-
             tagInfo.Records = new[] { new NFCNdefRecord
                         {
                             TypeFormat = NFCNdefTypeFormat.WellKnown,
@@ -98,19 +89,14 @@ namespace TychoClient.ViewModels
             {
                 _nfc.PublishMessage(tagInfo, false);
             });
-
         }
 
 
-        private void ReadTag()
+        private void ReadAndWriteTag()
         {
-            _nfc.StartListening();
-            _nfc.StartPublishing();
-            SomeData += "Started listening...! ";
-            //Device.BeginInvokeOnMainThread(() =>
-            //{
-            //    _nfc.OnMessageReceived += _nfc_OnMessageReceived;
-            //});
+            _nfc.StartListening(); // makes android use this App preferably the next time a tag is presented
+            _nfc.StartPublishing(); // prepares for writing
+            SomeData += "Waiting for tag...";
         }
 
         private void LogSomeData()
@@ -130,33 +116,8 @@ namespace TychoClient.ViewModels
             var newMessage = new String(Encoding.ASCII.GetChars(asBytes));
             SomeData += $"New Message: {newMessage}";
 
-            //var newPayload = _lastReadKeyContent.Records[0].Payload.Skip(4).ToArray();
-
-            //newPayload[0] = newPayload[0]++;
-
-            //_lastReadKeyContent = new TagInfo(_lastReadKeyContent.Identifier)
-            //{
-            //    Records = new[] { new NFCNdefRecord()
-            //    {
-            //        TypeFormat = _lastReadKeyContent.Records[0].TypeFormat,
-            //        Payload = newPayload,
-            //        MimeType = _lastReadKeyContent.Records[0].MimeType,
-            //        ExternalType = _lastReadKeyContent.Records[0].ExternalType,
-            //        LanguageCode = _lastReadKeyContent.Records[0].LanguageCode,
-            //    }},
-
-            //};
-
             SomeData += $"Payload as string: {new string(Encoding.ASCII.GetChars(_lastReadKeyContent.Records[0].Payload))}";
-            //_lastReadKeyContent.Records[0].Payload
-            // actually alter a byte here
         }
-
-        private void WriteToTag()
-        {
-
-            _nfc.StartPublishing();
-            
-        }
+        
     }
 }
