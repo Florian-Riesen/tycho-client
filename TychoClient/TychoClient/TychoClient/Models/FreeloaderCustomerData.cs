@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TychoClient.Models
 {
-    class FreeloaderCustomerData
+    public class FreeloaderCustomerData
     {
         private int _maxTransactions = 30;
 

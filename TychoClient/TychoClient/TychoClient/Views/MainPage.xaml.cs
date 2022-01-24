@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using TychoClient.Services;
 
 namespace TychoClient.Views
 {
@@ -22,8 +23,10 @@ namespace TychoClient.Views
 
         public async Task NavigateFromMenu(int id)
         {
+            Log.Line("Trying to navigate in MainPage");
             if (!MenuPages.ContainsKey(id))
             {
+                Log.Line("Page not yet loaded. Loading.");
                 switch (id)
                 {
                     //case (int)MenuItemType.Browse:
@@ -51,6 +54,8 @@ namespace TychoClient.Views
 
             if (newPage != null && Detail != newPage)
             {
+
+                Log.Line("Navigating now.");
                 Detail = newPage;
 
                 if (Device.RuntimePlatform == Device.Android)
