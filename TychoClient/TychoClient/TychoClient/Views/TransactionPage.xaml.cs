@@ -6,9 +6,9 @@ using Xamarin.Forms.Xaml;
 namespace TychoClient.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AboutPage : ContentPage
+    public partial class TransactionPage : ContentPage
     {
-        public AboutPage()
+        public TransactionPage()
         {
             InitializeComponent();
         }

@@ -17,7 +17,7 @@ namespace TychoClient.Views
 
             MasterBehavior = MasterBehavior.Popover;
 
-            MenuPages.Add((int)MenuItemType.Browse, (NavigationPage)Detail);
+            MenuPages.Add((int)MenuItemType.News, (NavigationPage)Detail);
         }
 
         public async Task NavigateFromMenu(int id)
@@ -26,11 +26,23 @@ namespace TychoClient.Views
             {
                 switch (id)
                 {
-                    case (int)MenuItemType.Browse:
-                        MenuPages.Add(id, new NavigationPage(new ItemsPage()));
+                    //case (int)MenuItemType.Browse:
+                    //    MenuPages.Add(id, new NavigationPage(new ItemsPage()));
+                    //    break;
+                    case (int)MenuItemType.News:
+                        MenuPages.Add(id, new NavigationPage(new NewsPage()));
                         break;
-                    case (int)MenuItemType.About:
-                        MenuPages.Add(id, new NavigationPage(new AboutPage()));
+                    case (int)MenuItemType.ReadCard:
+                        MenuPages.Add(id, new NavigationPage(new ReadCardPage()));
+                        break;
+                    case (int)MenuItemType.Login:
+                        MenuPages.Add(id, new NavigationPage(new LoginPage()));
+                        break;
+                    case (int)MenuItemType.BarMode:
+                        MenuPages.Add(id, new NavigationPage(new BarScannerPage()));
+                        break;
+                    case (int)MenuItemType.Transaction:
+                        MenuPages.Add(id, new NavigationPage(new TransactionPage()));
                         break;
                 }
             }

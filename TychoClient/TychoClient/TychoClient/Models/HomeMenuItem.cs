@@ -6,8 +6,12 @@ namespace TychoClient.Models
 {
     public enum MenuItemType
     {
-        Browse,
-        About
+        //Browse,
+        News,
+        ReadCard,
+        Login,
+        BarMode,
+        Transaction
     }
     public class HomeMenuItem
     {

@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace TychoClient.ViewModels
 {
-    public class AboutViewModel : BaseViewModel
+    public class BarScannerViewModel : BaseViewModel
     {
         private string _someData = "";
         private INFC _nfc => CrossNFC.Current;
@@ -25,7 +25,7 @@ namespace TychoClient.ViewModels
         public ICommand IncrementValueCommand { get; }
         public ICommand WriteToTagCommand { get; }
 
-        public AboutViewModel()
+        public BarScannerViewModel()
         {
             Title = "Scanner";
 

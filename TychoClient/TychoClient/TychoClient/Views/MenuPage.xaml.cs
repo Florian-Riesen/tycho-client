@@ -18,8 +18,12 @@ namespace TychoClient.Views
 
             menuItems = new List<HomeMenuItem>
             {
-                new HomeMenuItem {Id = MenuItemType.Browse, Title="Browse" },
-                new HomeMenuItem {Id = MenuItemType.About, Title="About" }
+                //new HomeMenuItem {Id = MenuItemType.Browse, Title="Browse" },
+                new HomeMenuItem {Id = MenuItemType.News, Title="News" },
+                new HomeMenuItem {Id = MenuItemType.ReadCard, Title="Read Card" },
+                new HomeMenuItem {Id = MenuItemType.Transaction, Title="Transaction" },
+                new HomeMenuItem {Id = MenuItemType.BarMode, Title="Bar Mode" },
+                new HomeMenuItem {Id = MenuItemType.Login, Title="Login" }
             };
 
             ListViewMenu.ItemsSource = menuItems;

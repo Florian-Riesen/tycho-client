@@ -14,4 +14,22 @@
     <PackageReference Include="Plugin.NFC" Version="0.1.20" />
     <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />  
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\ReadCardPage.xaml.cs">
+      <DependentUpon>ReadCardPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\NewsPage.xaml.cs">
+      <DependentUpon>NewsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TransactionPage.xaml.cs">
+      <DependentUpon>TransactionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\BarScannerPage.xaml.cs">
+      <DependentUpon>BarScannerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\LoginPage.xaml.cs">
+      <DependentUpon>LoginPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
