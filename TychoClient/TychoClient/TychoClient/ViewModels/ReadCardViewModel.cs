@@ -18,7 +18,7 @@ namespace TychoClient.ViewModels
         public byte[] ChipUid
         {
             get => _chipUid;
-            set => SetProperty(ref _chipUid, value);
+            private set => SetProperty(ref _chipUid, value);
         }
         
         private string _name;
@@ -62,19 +62,26 @@ namespace TychoClient.ViewModels
             get => _someData;
             set => SetProperty(ref _transactions, value);
         }
+        
+        public int CurrentBalance
+        {
+            get => CollapsedHistory + Transactions.Sum(t => t.Sum);
+        }
+
+        private int _collapsedHistory;
+        public int CollapsedHistory
+        {
+            get => _collapsedHistory;
+            set => SetProperty(ref _collapsedHistory, value);
+        }
 
 
-        public ICommand ReadTagCommand { get; }
         public ICommand ClearFormCommand { get; }
         public ICommand WriteToTagCommand { get; }
 
         public ReadCardViewModel()
         {
             Title = "Read Card";
-
-            
-
-            ReadTagCommand = new Command(); // start listening
             WriteToTagCommand = new Command(); // declare intent to write
             ClearFormCommand = new Command(ClearForm);
         }
@@ -90,10 +97,28 @@ namespace TychoClient.ViewModels
         	
         	Transactions.Clear();
         }
+        
+        protected override void OnRead(NfcEventArgs e)
+        {
+        //	base
+        	
+        	if(e.Data is null)
+        	  return;
+        	ChipUid = e.Data.ChipUid;
+        	CustomerName = e.Data.CustomerName;
+        	TransactionId = e.Data.ByteId;
+        	AvailableDrinks = e.Data.AvailableAlcoholTokens;
+        	SpentAlcoholTokens = e.Data.SpentAlcoholTokens;
+        	Checksum = e.Data.Fletcher32Checksum;
+        }
 
+        private void Write()
+        {
+        	var data = new FreeloaderCustomerData();
+        	// populate
+        	AddToWritingQueue(data);
+        }
         
-
-        
-        
+        // OnPropertyChanged update Checksum
     }
 }

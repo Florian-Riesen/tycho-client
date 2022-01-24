@@ -1,4 +1,4 @@
-﻿using Plugin.NFC;
+using Plugin.NFC;
 using System;
 using System.Linq;
 using System.Text;
@@ -10,114 +10,66 @@ namespace TychoClient.ViewModels
 {
     public class BarScannerViewModel : BaseViewModel
     {
-        private string _someData = "";
-        private INFC _nfc => CrossNFC.Current;
-        private ITagInfo _lastReadKeyContent;
-
-
-        public string SomeData
+        private int _tokensToBeCharged;
+        public int TokensToBeCharged
         {
-            get => _someData;
-            set => SetProperty(ref _someData, value + Environment.NewLine);
+            get => _tokensToBeCharged;
+            set 
+            {
+            	SetProperty(ref _tokensToBeCharged, value);
+            	if(value == 0)
+            	{
+            		// remove from write queue
+            	}
+            	else
+            	{
+            		// update entry in write queue
+            	}
+            }
         }
-
-        public ICommand ReadTagCommand { get; }
-        public ICommand IncrementValueCommand { get; }
-        public ICommand WriteToTagCommand { get; }
+        
+        private string _customerName;
+        public string CustomerName
+        {
+        	get => _customerName;
+        	private set => SetProperty(ref _customerName, value);
+        }
+        
+        private bool _rejected;
+        public bool PaymentRejected
+        {
+        	get => _rejected;
+        	private set => SetProperty(ref _rejected, value);
+        }
+        
+        private string _succeeded;
+        public string PaymentSucceeded
+        {
+        	get => _succeeded;
+        	private set => SetProperty(ref _succeeded, value);
+        }
+        
+        public ICommand IncrementByOneCommand { get; }
+        public ICommand IncrementByFourCommand { get; }
+        public ICommand OkCommand { get; }
 
         public BarScannerViewModel()
         {
-            Title = "Scanner";
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                _nfc.OnTagDiscovered += Current_OnTagDiscovered;
-                _nfc.OnTagConnected += Current_OnTagConnected;
-                _nfc.OnNfcStatusChanged += _nfc_OnNfcStatusChanged;
-                _nfc.OnTagListeningStatusChanged += _nfc_OnTagListeningStatusChanged;
-                _nfc.OnMessageReceived += _nfc_OnMessageReceived;
-            });
+            Title = "Bar Scanner";
             
-
-            ReadTagCommand = new Command(ReadAndWriteTag);
-            IncrementValueCommand = new Command(LogSomeData);
-        }
-
-        private void _nfc_OnMessageReceived(ITagInfo tagInfo)
-        {
-            SomeData += $"MESSAGE RECEIVED!";
-            SomeData += $"Tag id: {String.Join(":", tagInfo.Identifier.Select(b => b.ToString("x")))}";
-            SomeData += Newtonsoft.Json.JsonConvert.SerializeObject(tagInfo);
-            _lastReadKeyContent = tagInfo;
-            SomeData += $"TagInfo type: {tagInfo.GetType().Name}";
-            
-        }
-
-        private void _nfc_OnTagListeningStatusChanged(bool isListening)
-        {
-            SomeData += $"LISTENING STATUS CHANGED: {(isListening ? "started" : "stopped")} listening";
-        }
-
-
-        private void _nfc_OnNfcStatusChanged(bool isEnabled)
-        {
-            SomeData += "NFC status changed!";
-        }
-
-        private void Current_OnTagConnected(object sender, EventArgs e)
-        {
-            SomeData += "TAG CONNECTED!";
-            _nfc.StopListening();
-        }
-
-        private void Current_OnTagDiscovered(ITagInfo tagInfo, bool format)
-        {
-            SomeData += "TAG DISCOVERED!";
-
-            _lastReadKeyContent = tagInfo;
-            LogSomeData();
-
-            tagInfo.Records = new[] { new NFCNdefRecord
-                        {
-                            TypeFormat = NFCNdefTypeFormat.WellKnown,
-                            MimeType = "application/com.companyname.nfcsample",
-                            Payload = _lastReadKeyContent.Records[0].Payload.Skip(4).ToArray(),// NFCUtils.EncodeToByteArray("Plugin.NFC is awesome!"),
-                            LanguageCode = "en"
-                        }};
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                _nfc.PublishMessage(tagInfo, false);
-            });
-        }
-
-
-        private void ReadAndWriteTag()
-        {
-            _nfc.StartListening(); // makes android use this App preferably the next time a tag is presented
-            _nfc.StartPublishing(); // prepares for writing
-            SomeData += "Waiting for tag...";
-        }
-
-        private void LogSomeData()
-        {
-            if (_lastReadKeyContent is null || _lastReadKeyContent.Records.Length == 0
-                || _lastReadKeyContent.Records[0].Payload.Length < 8)
-                return;
-
-            var message = _lastReadKeyContent.Records[0].Message;
-            var asBytes = Encoding.ASCII.GetBytes(_lastReadKeyContent.Records[0].Message);
-
-            byte firstByte = asBytes[0];
-            SomeData += $"Message: {message}";
-            SomeData += $"As Bytes: {String.Join(":", asBytes.Select(b => b.ToString("X2")))}";
-            asBytes[0]++;
-            SomeData += $"New Bytes: {String.Join(":", asBytes.Select(b => b.ToString("X2")))}";
-            var newMessage = new String(Encoding.ASCII.GetChars(asBytes));
-            SomeData += $"New Message: {newMessage}";
-
-            SomeData += $"Payload as string: {new string(Encoding.ASCII.GetChars(_lastReadKeyContent.Records[0].Payload))}";
+            IncrementByOneCommand = new Command(() => TokensToBeCharged++);
+            IncrementByFourCommand = new Command(() => TokensToBeCharged += 4);
         }
         
+        protected override void OnRead(NfcEventArgs e)
+        {
+        	// base.OnRead(e);
+        	
+        	// call of this method means we attempted to charge tokens
+        	
+        	CustomerName = e.Data.CustomerName;
+        	
+        	// how to check if payment succeeded or failed?
+        }
     }
 }
