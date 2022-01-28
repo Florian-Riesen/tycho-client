@@ -3,51 +3,122 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
-using TychoClient.Services;
+using TychoClient.Models;
+
 using Xamarin.Forms;
 
 namespace TychoClient.ViewModels
 {
     public class ReadCardViewModel : BaseViewModel
     {
-        private string _someData = "";
 
+        private FreeloaderCustomerData _customerData;
 
-        public string SomeData
+        private byte[] _chipUid;
+        public byte[] ChipUid
         {
-            get => _someData;
-            set => SetProperty(ref _someData, value + Environment.NewLine);
+            get => _chipUid;
+            private set => SetProperty(ref _chipUid, value);
         }
 
-        public ICommand ReadTagCommand { get; }
+        private string _name;
+        public string CustomerName
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
 
+        private byte? _transactionId;
+        public byte? TransactionId
+        {
+            get => _transactionId;
+            set => SetProperty(ref _transactionId, value);
+        }
+
+        private byte? _availableDrinks;
+        public byte? AvailableDrinks
+        {
+            get => _availableDrinks;
+            set => SetProperty(ref _availableDrinks, value);
+        }
+
+        private byte? _spentAlc;
+        public byte? SpentAlcoholTokens
+        {
+            get => _spentAlc;
+            set => SetProperty(ref _spentAlc, value);
+        }
+
+        private byte[] _checksum;
+        public byte[] Checksum
+        {
+            get => _checksum;
+            set => SetProperty(ref _checksum, value);
+        }
+
+        private ObservableCollection<Transaction> _transactions;
+        public ObservableCollection<Transaction> Transactions
+        {
+            get => _someData;
+            set => SetProperty(ref _transactions, value);
+        }
+
+        public int CurrentBalance
+        {
+            get => CollapsedHistory + Transactions.Sum(t => t.Sum);
+        }
+
+        private int _collapsedHistory;
+        public int CollapsedHistory
+        {
+            get => _collapsedHistory;
+            set => SetProperty(ref _collapsedHistory, value);
+        }
+
+
+        public ICommand ClearFormCommand { get; }
         public ICommand WriteToTagCommand { get; }
 
         public ReadCardViewModel()
         {
             Title = "Read Card";
-            
-
-            ReadTagCommand = new Command(ReadAndWriteTag);
+            WriteToTagCommand = new Command(); // declare intent to write
+            ClearFormCommand = new Command(ClearForm);
         }
-        
 
-        protected override void OnFreeloaderCardScanned(NfcEventArgs e)
+        private void ClearForm()
         {
-            base.OnFreeloaderCardScanned(e);
+            ChipUid = null;
+            CustomerName = "";
+            TransactionId = null;
+            AvailableDrinks = null;
+            SpentAlcoholTokens = null;
+            Checksum = null;
 
-            SomeData += e.Data?.ToJson() ?? "No freeloader data found!";
+            Transactions.Clear();
         }
 
-
-        private void ReadAndWriteTag()
+        protected override void OnRead(NfcEventArgs e)
         {
-            //Nfc.StartListening(); // makes android use this App preferably the next time a tag is presented
-            //Nfc.StartPublishing(); // prepares for writing
-            //SomeData += "Waiting for tag...";
+            //	base
+
+            if (e.Data is null)
+                return;
+            ChipUid = e.Data.ChipUid;
+            CustomerName = e.Data.CustomerName;
+            TransactionId = e.Data.ByteId;
+            AvailableDrinks = e.Data.AvailableAlcoholTokens;
+            SpentAlcoholTokens = e.Data.SpentAlcoholTokens;
+            Checksum = e.Data.Fletcher32Checksum;
         }
 
-        
-        
+        private void Write()
+        {
+            var data = new FreeloaderCustomerData();
+            // populate
+            AddToWritingQueue(data);
+        }
+
+        // OnPropertyChanged update Checksum
     }
 }
