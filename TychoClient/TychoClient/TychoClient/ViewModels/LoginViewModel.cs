@@ -1,4 +1,4 @@
-﻿using Plugin.NFC;
+using Plugin.NFC;
 using System;
 using System.Linq;
 using System.Text;
@@ -35,10 +35,9 @@ namespace TychoClient.ViewModels
 
         private void Login()
         {
-            // check entered login against saved AES hash
-            // if it matches, unlock admin features
-            // save login and password
+        	// check entered login against saved AES hash
+        	// if it matches, unlock admin features
+        	// save login and password
         }
-
     }
 }

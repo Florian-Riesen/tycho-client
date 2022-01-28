@@ -1,4 +1,4 @@
-﻿using Plugin.NFC;
+using Plugin.NFC;
 using System;
 using System.Linq;
 using System.Text;
@@ -11,16 +11,15 @@ namespace TychoClient.ViewModels
 {
     public class ReadCardViewModel : BaseViewModel
     {
-
         private FreeloaderCustomerData _customerData;
-
+        
         private byte[] _chipUid;
         public byte[] ChipUid
         {
             get => _chipUid;
             private set => SetProperty(ref _chipUid, value);
         }
-
+		
         private string _name;
         public string CustomerName
         {
@@ -62,7 +61,7 @@ namespace TychoClient.ViewModels
             get => _someData;
             set => SetProperty(ref _transactions, value);
         }
-
+        
         public int CurrentBalance
         {
             get => CollapsedHistory + Transactions.Sum(t => t.Sum);
@@ -118,7 +117,5 @@ namespace TychoClient.ViewModels
             // populate
             AddToWritingQueue(data);
         }
-
-        // OnPropertyChanged update Checksum
     }
 }

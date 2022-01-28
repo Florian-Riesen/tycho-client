@@ -1,4 +1,4 @@
-﻿using Plugin.NFC;
+using Plugin.NFC;
 using System;
 using System.Linq;
 using System.Text;
@@ -69,7 +69,50 @@ namespace TychoClient.ViewModels
 
             CustomerName = e.Data.CustomerName;
 
-            // how to check if payment succeeded or failed?
+        }
+        
+        private string _customerName;
+        public string CustomerName
+        {
+        	get => _customerName;
+        	private set => SetProperty(ref _customerName, value);
+        }
+        
+        private bool _rejected;
+        public bool PaymentRejected
+        {
+        	get => _rejected;
+        	private set => SetProperty(ref _rejected, value);
+        }
+        
+        private string _succeeded;
+        public string PaymentSucceeded
+        {
+        	get => _succeeded;
+        	private set => SetProperty(ref _succeeded, value);
+        }
+        
+        public ICommand IncrementByOneCommand { get; }
+        public ICommand IncrementByFourCommand { get; }
+        public ICommand OkCommand { get; }
+
+        public BarScannerViewModel()
+        {
+            Title = "Bar Scanner";
+            
+            IncrementByOneCommand = new Command(() => TokensToBeCharged++);
+            IncrementByFourCommand = new Command(() => TokensToBeCharged += 4);
+        }
+        
+        protected override void OnRead(NfcEventArgs e)
+        {
+        	// base.OnRead(e);
+        	
+        	// call of this method means we attempted to charge tokens
+        	
+        	CustomerName = e.Data.CustomerName;
+        	
+        	// how to check if payment succeeded or failed?
         }
     }
 }
