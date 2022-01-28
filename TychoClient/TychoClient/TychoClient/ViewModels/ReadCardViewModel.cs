@@ -1,10 +1,11 @@
 using Plugin.NFC;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using TychoClient.Models;
-
+using TychoClient.Services;
 using Xamarin.Forms;
 
 namespace TychoClient.ViewModels
@@ -58,7 +59,7 @@ namespace TychoClient.ViewModels
         private ObservableCollection<Transaction> _transactions;
         public ObservableCollection<Transaction> Transactions
         {
-            get => _someData;
+            get => _transactions;
             set => SetProperty(ref _transactions, value);
         }
         
@@ -81,7 +82,7 @@ namespace TychoClient.ViewModels
         public ReadCardViewModel()
         {
             Title = "Read Card";
-            WriteToTagCommand = new Command(); // declare intent to write
+            WriteToTagCommand = new Command(Write); // declare intent to write
             ClearFormCommand = new Command(ClearForm);
         }
 
@@ -97,7 +98,7 @@ namespace TychoClient.ViewModels
             Transactions.Clear();
         }
 
-        protected override void OnRead(NfcEventArgs e)
+        protected override void OnFreeloaderCardScanned(NfcEventArgs e)
         {
             //	base
 
@@ -115,7 +116,7 @@ namespace TychoClient.ViewModels
         {
             var data = new FreeloaderCustomerData();
             // populate
-            AddToWritingQueue(data);
+            //AddToWritingQueue(data);
         }
     }
 }
