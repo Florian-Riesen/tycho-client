@@ -33,7 +33,6 @@ namespace TychoClient.Services
             Device.BeginInvokeOnMainThread(() =>
             {
                 Nfc.OnTagDiscovered += Current_OnTagDiscovered;
-                //Nfc.OnTagConnected += Current_OnTagConnected;
                 Nfc.OnNfcStatusChanged += _nfc_OnNfcStatusChanged;
                 Nfc.OnTagListeningStatusChanged += _nfc_OnTagListeningStatusChanged;
                 Nfc.OnMessageReceived += _nfc_OnMessageReceived;
@@ -49,6 +48,7 @@ namespace TychoClient.Services
             Log.Line($"NFCService: Tag id: {String.Join(":", tagInfo.Identifier.Select(b => b.ToString("x")))}");
             Log.Line("NFCService: " + Newtonsoft.Json.JsonConvert.SerializeObject(tagInfo));
             Log.Line($"NFCService: TagInfo type: {tagInfo.GetType().Name}");
+            Nfc.StartPublishing();
         }
 
         private void _nfc_OnTagListeningStatusChanged(bool isListening)
@@ -67,100 +67,110 @@ namespace TychoClient.Services
         {
             Log.Line("NFCService: TAG DISCOVERED!");
 
-            if(tagInfo.Records != null && tagInfo.Records.Length == 1)
+            ReadTag(tagInfo);
+
+            WriteTag(tagInfo);
+            
+            Nfc.StartPublishing();
+        }
+
+        private void WriteTag(ITagInfo tagInfo)
+        {
+            if (DataToWrite == null)
             {
-                var message = tagInfo.Records[0].Payload;
-
-                if (_lastPayload != null)
-                    Log.Line("NfcService: Previously Written Bytes: \r\n" + string.Join(":", _lastPayload));
-                Log.Line("NfcService: Read Bytes: \r\n" + string.Join(":", message));
-
-
-                try
-                {
-                    var data = FreeloaderCustomerData.FromBytes(tagInfo.Identifier, message);
-                    Log.Line("NFCService: Freeloader block deserialized!");
-                    FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { Data = data, MetaData = tagInfo });
-                }
-                catch(Exception e)
-                {
-                    Log.Line("NFCService: Error while reading NFC!" + e.ToString());
-                    FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
-                }
-
-            }
-            else
-            {
-                Log.Line($"NFCService: Error: Chip contains {tagInfo.Records?.Length} records instead of exactly 1.");
-                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
+                Log.Line("NFCService: There is no data to write.");
+                return;
             }
 
-            if (DataToWrite != null)
+            if (!Enumerable.SequenceEqual(DataToWrite.ChipUid, tagInfo.Identifier))
             {
-                if (Enumerable.SequenceEqual(DataToWrite.ChipUid, tagInfo.Identifier))
-                {
-                    Log.Line("NFCService: There is some data to write.");
+                Log.Line($"NFCService: The Data to write does not target the presented tag. ID of presented tag: {string.Join(":", tagInfo.Identifier)}, ID of waiting data: {string.Join(":", DataToWrite.ChipUid)}");
+                return;
+            }
 
-                    //tagInfo.Records[0].TypeFormat = NFCNdefTypeFormat.Unknown;
-                    //tagInfo.Records[0].LanguageCode = "";
-                    //tagInfo.Records[0].Payload = DataToWrite.ToBytes();
-                    //tagInfo.Records[0].TypeFormat = NFCNdefTypeFormat.Unknown;
-                    //tagInfo.Records[0].LanguageCode = "";
+            Log.Line("NFCService: There is some data to write.");
+            
+            var bytes = DataToWrite.ToBytes();
 
-                    var bytes = DataToWrite.ToBytes();
-
-                    Log.Line("NFCService: Data as bytes: " + string.Join(":", bytes));
-                    tagInfo.Records = new[] {
+            Log.Line("NFCService: Data as bytes: " + string.Join(":", bytes));
+            tagInfo.Records = new[] {
                     new NFCNdefRecord
                     {
                         TypeFormat = NFCNdefTypeFormat.Mime,
-                        MimeType = "application/com.companyname.nfcsample",
+                        MimeType = "application/com.tycho.scanner",
                         Payload = bytes
                     }};
 
-                    Log.Line("NFCService: Data as bytes in Record: " + string.Join(":", tagInfo.Records[0].Payload));
-                    _lastPayload = tagInfo.Records[0].Payload.ToList();
+            Log.Line("NFCService: Data as bytes in Record: " + string.Join(":", tagInfo.Records[0].Payload));
+            Log.Line("NFCService: Data as JSON: " + DataToWrite.ToJson());
+            _lastPayload = tagInfo.Records[0].Payload.ToList();
 
+            try
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
                     try
                     {
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            Nfc.PublishMessage(tagInfo, false);
-                        });
-                        Log.Line("NFCService: Written successfully!");
-                        DataToWrite = null;
-                        FreeloaderCardWritten?.Invoke(this, new RfidEventArgs() { Data = DataToWrite, MetaData = tagInfo });
+                        Nfc.PublishMessage(tagInfo, false);
                     }
-                    catch (Exception e)
+                    catch(Exception ex)
                     {
-                        Log.Line("NFCService: Error while writing NFC!" + e.ToString());
+
+                        Log.Line("NFCService: Tag IO Error: " + ex.ToString());
                     }
-
-                }
-                else
-                    Log.Line($"NFCService: The Data to write does not target the presented tag. ID of presented tag: {string.Join(":",tagInfo.Identifier)}, ID of waiting data: {string.Join(":", DataToWrite.ChipUid)}");
+                });
+                Log.Line("NFCService: Written successfully!");
+                DataToWrite = null;
+                FreeloaderCardWritten?.Invoke(this, new RfidEventArgs() { Data = DataToWrite, MetaData = tagInfo });
             }
-            else
-                Log.Line("NFCService: There is no data to write.");
+            catch (Exception e)
+            {
+                Log.Line("NFCService: Error while writing NFC!" + e.ToString());
+            }
+        }
 
-            
+        private void ReadTag(ITagInfo tagInfo)
+        {
+            if (DataToWrite != null)
+            {
+                Log.Line("NfcService: There is some data to write. No reading will be done.");
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
+                return;
+            }
+
+            if (tagInfo.Records == null)
+            {
+                Log.Line("NfcService: Tag contains no records. No reading will be done.");
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
+                return;
+            }
+
+            if (tagInfo.Records.Length != 1)
+            {
+                Log.Line($"NFCService: Error: Chip contains {tagInfo.Records?.Length} records instead of exactly 1.");
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
+                return;
+            }
+            var message = tagInfo.Records[0].Payload;
+
+            if (_lastPayload != null)
+                Log.Line("NfcService: Previously Written Bytes: \r\n" + string.Join(":", _lastPayload));
+            Log.Line("NfcService: Read Bytes: \r\n" + string.Join(":", message));
 
 
-            //_lastReadKeyContent = tagInfo;
-            //LogSomeData();
+            try
+            {
+                var data = FreeloaderCustomerData.FromBytes(tagInfo.Identifier, message);
+                Log.Line("NFCService: Freeloader block deserialized!");
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { Data = data, MetaData = tagInfo });
+            }
+            catch (Exception e)
+            {
+                Log.Line("NFCService: Error while reading NFC!" + e.ToString());
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
+            }
 
-            //tagInfo.Records = new[] { new NFCNdefRecord
-            //            {
-            //                TypeFormat = NFCNdefTypeFormat.WellKnown,
-            //                MimeType = "application/com.companyname.nfcsample",
-            //                Payload = _lastReadKeyContent.Records[0].Payload.Skip(4).ToArray(),// NFCUtils.EncodeToByteArray("Plugin.NFC is awesome!"),
-            //                LanguageCode = "en"
-            //            }};
 
-            //Device.BeginInvokeOnMainThread(() =>
-            //{
-            //    Nfc.PublishMessage(tagInfo, false);
-            //});
         }
     }
 

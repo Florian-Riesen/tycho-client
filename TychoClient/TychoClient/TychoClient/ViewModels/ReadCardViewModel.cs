@@ -1,8 +1,6 @@
-using Plugin.NFC;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows.Input;
 using TychoClient.Models;
 using TychoClient.Services;
@@ -12,8 +10,6 @@ namespace TychoClient.ViewModels
 {
     public class ReadCardViewModel : NfcAwareViewModel
     {
-        private FreeloaderCustomerData _customerData;
-        
         private string _chipUid;
         public string ChipUid
         {
@@ -82,7 +78,7 @@ namespace TychoClient.ViewModels
         public ReadCardViewModel()
         {
             Title = "Read Card";
-            WriteToTagCommand = new Command(Write); // declare intent to write
+            WriteToTagCommand = new Command(Write);
             ClearFormCommand = new Command(ClearForm);
         }
 
@@ -115,7 +111,8 @@ namespace TychoClient.ViewModels
             TransactionId = e.Data.ByteId.ToString();
             AvailableDrinks = e.Data.AvailableAlcoholTokens.ToString();
             SpentAlcoholTokens = e.Data.SpentAlcoholTokens.ToString();
-            Checksum = string.Join(":", e.Data.Fletcher32Checksum); 
+            Checksum = string.Join(":", e.Data.Fletcher32Checksum);
+            CollapsedHistory = e.Data.CollapsedTransactionHistory.ToString();
         }
 
         private void Write()
@@ -127,9 +124,12 @@ namespace TychoClient.ViewModels
             };
 
             data.CollapsedTransactionHistory = int.TryParse(CollapsedHistory, out int parsedCollapsedHistory) ? parsedCollapsedHistory : 0;
-            data.ByteId = Byte.TryParse(TransactionId, out byte result) ? result : (byte)0;
+            data.ByteId = byte.TryParse(TransactionId, out byte result) ? result : (byte)0;
             if (Transactions != null)
                 data.Transactions = Transactions.ToList();
+
+            data.AvailableAlcoholTokens = byte.TryParse(AvailableDrinks, out byte resDrinks) ? resDrinks : (byte)0;
+            data.SpentAlcoholTokens = byte.TryParse(SpentAlcoholTokens, out byte resSpent) ? resSpent : (byte)0;
 
             data.Fletcher32Checksum = data.CalculateFletcher32("ThereBeDragons");
             DataToWrite = data;

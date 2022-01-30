@@ -49,14 +49,7 @@
                 <Editor Text="{Binding SpentAlcoholTokens}"/>
 
                 <Label Text="Checksum"/>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Text="{Binding Checksum}"/>
-                    <Button Text="Calculate checksum" Grid.Column="1"/>
-                </Grid>
+                <Label Text="{Binding Checksum}"/>
 
                 <Label Text="Collapsed history"/>
                 <Editor Text="{Binding CollapsedHistory}"/>

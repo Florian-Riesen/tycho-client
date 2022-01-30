@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TychoClient.Services;
 
 namespace TychoClient.Models
 {
@@ -114,6 +115,7 @@ namespace TychoClient.Models
         // Assumes a raw payload without a preceding language tag.
         public static FreeloaderCustomerData FromBytes(byte[] uid, byte[] payload)
         {
+            Log.Line("FreelaoderData: Deserializing " + string.Join(":", payload));
             var ret = new FreeloaderCustomerData();
             ret.ChipUid = new List<byte>(uid).ToArray();
             ret.CustomerName = Encoding.ASCII.GetString(payload.Take(20).ToArray()).TrimEnd();
@@ -132,6 +134,8 @@ namespace TychoClient.Models
                 payloadCopy = payloadCopy.Skip(3).ToList();
                 ret.Transactions.Add(t);
             }
+
+
             return ret;
         }
 
@@ -154,6 +158,7 @@ namespace TychoClient.Models
                 bytes.Add(t.PartnerByteId);
             }
 
+            Log.Line("FreelaoderData:   Serializing " + string.Join(":", bytes));
             return bytes.ToArray();
         }
 
