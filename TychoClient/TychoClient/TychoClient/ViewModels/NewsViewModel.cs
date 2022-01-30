@@ -29,14 +29,14 @@ namespace TychoClient.ViewModels
         {
             Title = "Tycho Station News";
 
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                _nfc.OnTagDiscovered += Current_OnTagDiscovered;
-                _nfc.OnTagConnected += Current_OnTagConnected;
-                _nfc.OnNfcStatusChanged += _nfc_OnNfcStatusChanged;
-                _nfc.OnTagListeningStatusChanged += _nfc_OnTagListeningStatusChanged;
-                _nfc.OnMessageReceived += _nfc_OnMessageReceived;
-            });
+            //Device.BeginInvokeOnMainThread(() =>
+            //{
+            //    _nfc.OnTagDiscovered += Current_OnTagDiscovered;
+            //    _nfc.OnTagConnected += Current_OnTagConnected;
+            //    _nfc.OnNfcStatusChanged += _nfc_OnNfcStatusChanged;
+            //    _nfc.OnTagListeningStatusChanged += _nfc_OnTagListeningStatusChanged;
+            //    _nfc.OnMessageReceived += _nfc_OnMessageReceived;
+            //});
             
 
             ReadTagCommand = new Command(ReadAndWriteTag);

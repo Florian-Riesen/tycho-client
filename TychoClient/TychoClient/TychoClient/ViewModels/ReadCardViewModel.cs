@@ -98,7 +98,7 @@ namespace TychoClient.ViewModels
             Transactions.Clear();
         }
 
-        protected override void OnFreeloaderCardScanned(NfcEventArgs e)
+        protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
             //	base
 

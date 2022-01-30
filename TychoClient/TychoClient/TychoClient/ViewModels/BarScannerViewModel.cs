@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace TychoClient.ViewModels
 {
-    public class BarScannerViewModel : BaseViewModel
+    public class BarScannerViewModel : NfcAwareViewModel
     {
         private int _tokensToBeCharged;
         public int TokensToBeCharged
@@ -61,7 +61,7 @@ namespace TychoClient.ViewModels
             IncrementByFourCommand = new Command(() => TokensToBeCharged += 4);
         }
 
-        protected override void OnFreeloaderCardScanned(NfcEventArgs e)
+        protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
             // base.OnRead(e);
 
