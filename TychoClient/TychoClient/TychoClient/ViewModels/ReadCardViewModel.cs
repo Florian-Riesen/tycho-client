@@ -10,6 +10,14 @@ namespace TychoClient.ViewModels
 {
     public class ReadCardViewModel : NfcAwareViewModel
     {
+        private bool _editable;
+
+        public bool Editable
+        {
+            get => _editable;
+            set => SetProperty(ref _editable, value);
+        }
+
         private string _chipUid;
         public string ChipUid
         {
@@ -84,6 +92,8 @@ namespace TychoClient.ViewModels
 
         private void ClearForm()
         {
+            Editable = LoginData.IsAdmin;
+
             ChipUid = "";
             CustomerName = "";
             TransactionId = "";
@@ -131,7 +141,7 @@ namespace TychoClient.ViewModels
             data.AvailableAlcoholTokens = byte.TryParse(AvailableDrinks, out byte resDrinks) ? resDrinks : (byte)0;
             data.SpentAlcoholTokens = byte.TryParse(SpentAlcoholTokens, out byte resSpent) ? resSpent : (byte)0;
 
-            data.Fletcher32Checksum = data.CalculateFletcher32("ThereBeDragons");
+            data.Fletcher32Checksum = data.CalculateFletcher32(LoginData.Password);
             DataToWrite = data;
             Log.Line("ReadCardVm: Prepared Data for write!");
         }
