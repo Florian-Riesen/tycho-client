@@ -27,7 +27,7 @@ namespace TychoClient.Services
         public static void Line(string message)
         {
             Trace.WriteLine(message);
-            Debug.WriteLine(message);
+            //Debug.WriteLine(message);
             if (!(Instance.LogFile is null))
                 Instance.WriteToFile(message);
         }

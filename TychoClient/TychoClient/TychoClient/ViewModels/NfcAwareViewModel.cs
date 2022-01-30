@@ -9,7 +9,11 @@ namespace TychoClient.ViewModels
     public class NfcAwareViewModel : BaseViewModel
     {
         private SelectionWatcher _watcher;
-        protected FreeloaderCustomerData DataToWrite => Nfc.DataToWrite;
+        protected FreeloaderCustomerData DataToWrite
+        {
+            get => Nfc.DataToWrite;
+            set => Nfc.DataToWrite = value;
+        }
 
         public NfcService Nfc => NfcService.GetInstance();
 

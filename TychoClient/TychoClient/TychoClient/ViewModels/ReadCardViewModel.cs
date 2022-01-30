@@ -10,15 +10,15 @@ using Xamarin.Forms;
 
 namespace TychoClient.ViewModels
 {
-    public class ReadCardViewModel : BaseViewModel
+    public class ReadCardViewModel : NfcAwareViewModel
     {
         private FreeloaderCustomerData _customerData;
         
-        private byte[] _chipUid;
-        public byte[] ChipUid
+        private string _chipUid;
+        public string ChipUid
         {
             get => _chipUid;
-            private set => SetProperty(ref _chipUid, value);
+            set => SetProperty(ref _chipUid, value);
         }
 		
         private string _name;
@@ -28,29 +28,29 @@ namespace TychoClient.ViewModels
             set => SetProperty(ref _name, value);
         }
 
-        private byte? _transactionId;
-        public byte? TransactionId
+        private string _transactionId;
+        public string TransactionId
         {
             get => _transactionId;
             set => SetProperty(ref _transactionId, value);
         }
 
-        private byte? _availableDrinks;
-        public byte? AvailableDrinks
+        private string _availableDrinks;
+        public string AvailableDrinks
         {
             get => _availableDrinks;
             set => SetProperty(ref _availableDrinks, value);
         }
 
-        private byte? _spentAlc;
-        public byte? SpentAlcoholTokens
+        private string _spentAlc;
+        public string SpentAlcoholTokens
         {
             get => _spentAlc;
             set => SetProperty(ref _spentAlc, value);
         }
 
-        private byte[] _checksum;
-        public byte[] Checksum
+        private string _checksum;
+        public string Checksum
         {
             get => _checksum;
             set => SetProperty(ref _checksum, value);
@@ -63,13 +63,13 @@ namespace TychoClient.ViewModels
             set => SetProperty(ref _transactions, value);
         }
         
-        public int CurrentBalance
-        {
-            get => CollapsedHistory + Transactions.Sum(t => t.Sum);
-        }
+        //public int CurrentBalance
+        //{
+        //    get => CollapsedHistory + Transactions.Sum(t => t.Sum);
+        //}
 
-        private int _collapsedHistory;
-        public int CollapsedHistory
+        private string _collapsedHistory;
+        public string CollapsedHistory
         {
             get => _collapsedHistory;
             set => SetProperty(ref _collapsedHistory, value);
@@ -88,35 +88,52 @@ namespace TychoClient.ViewModels
 
         private void ClearForm()
         {
-            ChipUid = null;
+            ChipUid = "";
             CustomerName = "";
-            TransactionId = null;
-            AvailableDrinks = null;
-            SpentAlcoholTokens = null;
-            Checksum = null;
+            TransactionId = "";
+            AvailableDrinks = "";
+            SpentAlcoholTokens = "";
+            Checksum = "";
+            CollapsedHistory = "";
 
-            Transactions.Clear();
+            Transactions?.Clear();
         }
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
-            //	base
-
+            Log.Line("ReadCardVm: Card scanned!");
             if (e.Data is null)
+            {
+                Log.Line("ReadCardVm: No data in scan!");
+                ChipUid = string.Join(":", e.MetaData.Identifier);
+                Log.Line($"ReadCardVm: Read UID {ChipUid} from metadata.");
                 return;
-            ChipUid = e.Data.ChipUid;
+            }
+
+            ChipUid = string.Join(":", e.Data.ChipUid);
             CustomerName = e.Data.CustomerName;
-            TransactionId = e.Data.ByteId;
-            AvailableDrinks = e.Data.AvailableAlcoholTokens;
-            SpentAlcoholTokens = e.Data.SpentAlcoholTokens;
-            Checksum = e.Data.Fletcher32Checksum;
+            TransactionId = e.Data.ByteId.ToString();
+            AvailableDrinks = e.Data.AvailableAlcoholTokens.ToString();
+            SpentAlcoholTokens = e.Data.SpentAlcoholTokens.ToString();
+            Checksum = string.Join(":", e.Data.Fletcher32Checksum); 
         }
 
         private void Write()
         {
-            var data = new FreeloaderCustomerData();
-            // populate
-            //AddToWritingQueue(data);
+            var data = new FreeloaderCustomerData()
+            {
+                ChipUid = ChipUid.Split(':').Select(sb => Byte.Parse(sb)).ToArray(),
+                CustomerName = CustomerName,
+            };
+
+            data.CollapsedTransactionHistory = int.TryParse(CollapsedHistory, out int parsedCollapsedHistory) ? parsedCollapsedHistory : 0;
+            data.ByteId = Byte.TryParse(TransactionId, out byte result) ? result : (byte)0;
+            if (Transactions != null)
+                data.Transactions = Transactions.ToList();
+
+            data.Fletcher32Checksum = data.CalculateFletcher32("ThereBeDragons");
+            DataToWrite = data;
+            Log.Line("ReadCardVm: Prepared Data for write!");
         }
     }
 }

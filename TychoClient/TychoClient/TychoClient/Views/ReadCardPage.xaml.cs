@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TychoClient.Models;
 using TychoClient.ViewModels;
 using Xamarin.Forms;
@@ -12,12 +13,8 @@ namespace TychoClient.Views
         public ReadCardPage()
         {
             InitializeComponent();
-        }
-
-        public void SetSelectionWatcher(SelectionWatcher watcher)
-        {
-            if (BindingContext is BaseViewModel b)
-                b.Watcher = watcher;
+            if (BindingContext is NfcAwareViewModel vm)
+                vm.Watcher = AllSelectionWatchers.List.FirstOrDefault(w => w.WatchedMenuItem == MenuItemType.ReadCard);
         }
     }
 }
