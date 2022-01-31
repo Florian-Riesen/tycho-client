@@ -11,12 +11,19 @@ namespace TychoClient.ViewModels
     public class ReadCardViewModel : NfcAwareViewModel
     {
         private bool _editable;
-
         public bool Editable
         {
             get => _editable;
             set => SetProperty(ref _editable, value);
         }
+
+        private bool? _checksumMatches;
+        public bool? ChecksumMatches
+        {
+            get => _checksumMatches;
+            set => SetProperty(ref _checksumMatches, value);
+        }
+
 
         private string _chipUid;
         public string ChipUid
@@ -92,8 +99,6 @@ namespace TychoClient.ViewModels
 
         private void ClearForm()
         {
-            Editable = LoginData.IsAdmin;
-
             ChipUid = "";
             CustomerName = "";
             TransactionId = "";
@@ -101,16 +106,19 @@ namespace TychoClient.ViewModels
             SpentAlcoholTokens = "";
             Checksum = "";
             CollapsedHistory = "";
+            ChecksumMatches = null;
 
             Transactions?.Clear();
         }
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
+            Editable = LoginData.IsAdmin;
             Log.Line("ReadCardVm: Card scanned!");
             if (e.Data is null)
             {
                 Log.Line("ReadCardVm: No data in scan!");
+                ClearForm();
                 ChipUid = string.Join(":", e.MetaData.Identifier);
                 Log.Line($"ReadCardVm: Read UID {ChipUid} from metadata.");
                 return;
@@ -122,7 +130,14 @@ namespace TychoClient.ViewModels
             AvailableDrinks = e.Data.AvailableAlcoholTokens.ToString();
             SpentAlcoholTokens = e.Data.SpentAlcoholTokens.ToString();
             Checksum = string.Join(":", e.Data.Fletcher32Checksum);
+            ChecksumMatches = Enumerable.SequenceEqual(e.Data.Fletcher32Checksum, e.Data.CalculateFletcher32(LoginData.Password));
             CollapsedHistory = e.Data.CollapsedTransactionHistory.ToString();
+        }
+
+        protected override void OnUserNavigatedHere()
+        {
+            base.OnUserNavigatedHere();
+            Editable = LoginData.IsAdmin;
         }
 
         private void Write()

@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Application xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:TychoClient.Converters"
              x:Class="TychoClient.App">
     <Application.Resources>
         <ResourceDictionary>
+            <converters:IsEmptyOrNullConverter x:Key="IsEmptyOrNullConverter"/>
+            <converters:IsEmptyOrNullConverter x:Key="InverseIsEmptyOrNullConverter" Invert="True"/>
             <!--Global Styles-->
             <Color x:Key="NavigationPrimary">#2196F3</Color>
             <Style TargetType="NavigationPage">

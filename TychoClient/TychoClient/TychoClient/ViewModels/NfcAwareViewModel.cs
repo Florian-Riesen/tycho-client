@@ -61,7 +61,11 @@ namespace TychoClient.ViewModels
 
         private void _watcher_GotSelected(object sender, EventArgs e)
         {
+            OnUserNavigatedHere();
         }
+
+        protected virtual void OnUserNavigatedHere()
+        { }
 
         private void Nfc_FreeloaderCardScanned(object sender, RfidEventArgs e)
         {

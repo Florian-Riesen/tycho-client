@@ -31,7 +31,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Text="Write to chip" Command="{Binding WriteToTagCommand}" IsVisible="{Binding Editable}" Margin="0"/>
+        <Button Text="Write to chip" Command="{Binding WriteToTagCommand}" IsVisible="{Binding Editable}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0"/>
         <Button Text="Clear" BackgroundColor="Red"  Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0,6,6,0"/>
 
         <ScrollView Grid.Row="1" Grid.ColumnSpan="2">
@@ -52,7 +52,23 @@
                 <Entry Text="{Binding SpentAlcoholTokens}" IsEnabled="{Binding Editable}"/>
 
                 <Label Text="Checksum"  Margin="{StaticResource DistanceLabel}"/>
-                <Label Text="{Binding Checksum}"/>
+                <Label Text="{Binding Checksum}">
+                    <Label.Style>
+                        <Style TargetType="{x:Type Label}">
+                            <Style.Triggers>
+                                <DataTrigger TargetType="{x:Type Label}" Binding="{Binding ChecksumMatches}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="Green"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="{x:Type Label}" Binding="{Binding ChecksumMatches}" Value="False">
+                                    <Setter Property="BackgroundColor" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="{x:Type Label}" Binding="{Binding ChecksumMatches}" Value="{x:Null}">
+                                    <Setter Property="BackgroundColor" Value="Transparent"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
+                </Label>
 
                 <Label Text="Collapsed history"  Margin="{StaticResource DistanceLabel}"/>
                 <Entry Text="{Binding CollapsedHistory}" IsEnabled="{Binding Editable}"/>

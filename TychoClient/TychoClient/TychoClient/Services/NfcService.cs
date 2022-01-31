@@ -97,7 +97,8 @@ namespace TychoClient.Services
                     new NFCNdefRecord
                     {
                         TypeFormat = NFCNdefTypeFormat.Mime,
-                        MimeType = "application/com.tycho.scanner",
+                        //MimeType = "application/com.tycho.scanner",
+                        MimeType = "a/c",
                         Payload = bytes
                     }};
 

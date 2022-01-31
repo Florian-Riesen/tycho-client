@@ -8,14 +8,14 @@ namespace TychoClient.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
-        private string _username;
+        private string _username = "";
         public string UserName
         {
             get => _username;
             set => SetProperty(ref _username, value);
         }
 
-        private string _password;
+        private string _password = "";
         public string Password
         {
             get => _password;
@@ -43,6 +43,9 @@ namespace TychoClient.ViewModels
     {
         public static bool IsAdminPassword(string enteredPassword)
         {
+            // DEBUG
+            return ! (enteredPassword == "user");
+
             byte[] adminPwHash = LoadAdminPwHash();
             byte[] userPwBytes = Encoding.ASCII.GetBytes(enteredPassword);
             byte[] salt = LoadAdminPwSalt();
@@ -71,8 +74,8 @@ namespace TychoClient.ViewModels
 
     public static class LoginData
     {
-        public static string Username { get; set; }
-        public static string Password { get; set; }
+        public static string Username { get; set; } = "";
+        public static string Password { get; set; } = "";
         public static bool IsAdmin { get; set; }
     }
 }
