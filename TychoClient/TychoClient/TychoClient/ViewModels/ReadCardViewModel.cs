@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -10,11 +11,11 @@ namespace TychoClient.ViewModels
 {
     public class ReadCardViewModel : NfcAwareViewModel
     {
-        private bool _editable;
-        public bool Editable
+        private bool _readonly;
+        public bool Readonly
         {
-            get => _editable;
-            set => SetProperty(ref _editable, value);
+            get => _readonly;
+            set => SetProperty(ref _readonly, value);
         }
 
         private bool? _checksumMatches;
@@ -67,17 +68,16 @@ namespace TychoClient.ViewModels
             set => SetProperty(ref _checksum, value);
         }
 
-        private ObservableCollection<Transaction> _transactions;
         public ObservableCollection<Transaction> Transactions
         {
-            get => _transactions;
-            set => SetProperty(ref _transactions, value);
+            get;
+            set;
+        } = new ObservableCollection<Transaction>();
+
+        public string CurrentBalance
+        {
+            get => int.TryParse(CollapsedHistory, out int parsedCollapsed) ? (parsedCollapsed + Transactions.Sum(t => t.Sum)).ToString() : "";
         }
-        
-        //public int CurrentBalance
-        //{
-        //    get => CollapsedHistory + Transactions.Sum(t => t.Sum);
-        //}
 
         private string _collapsedHistory;
         public string CollapsedHistory
@@ -89,14 +89,18 @@ namespace TychoClient.ViewModels
 
         public ICommand ClearFormCommand { get; }
         public ICommand WriteToTagCommand { get; }
+        public ICommand AddTransactionCommand { get; }
 
         public ReadCardViewModel()
         {
             Title = "Read Card";
             WriteToTagCommand = new Command(Write);
             ClearFormCommand = new Command(ClearForm);
+            AddTransactionCommand = new Command(() => Transactions.Add(new Transaction()));
+            UpdateReadonly();
+            Transactions.CollectionChanged += (s,e) => OnPropertyChanged(nameof(CurrentBalance));
         }
-
+        
         private void ClearForm()
         {
             ChipUid = "";
@@ -108,12 +112,12 @@ namespace TychoClient.ViewModels
             CollapsedHistory = "";
             ChecksumMatches = null;
 
-            Transactions?.Clear();
+            Transactions.Clear();
         }
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
-            Editable = LoginData.IsAdmin;
+            UpdateReadonly();
             Log.Line("ReadCardVm: Card scanned!");
             if (e.Data is null)
             {
@@ -130,15 +134,20 @@ namespace TychoClient.ViewModels
             AvailableDrinks = e.Data.AvailableAlcoholTokens.ToString();
             SpentAlcoholTokens = e.Data.SpentAlcoholTokens.ToString();
             Checksum = string.Join(":", e.Data.Fletcher32Checksum);
-            ChecksumMatches = Enumerable.SequenceEqual(e.Data.Fletcher32Checksum, e.Data.CalculateFletcher32(LoginData.Password));
+            ChecksumMatches = LoginData.IsAdmin ? (bool?)Enumerable.SequenceEqual(e.Data.Fletcher32Checksum, e.Data.CalculateFletcher32(LoginData.Password)) : null;
             CollapsedHistory = e.Data.CollapsedTransactionHistory.ToString();
+            Transactions.Clear();
+            foreach (var t in e.Data.Transactions)
+                Transactions.Add(t);
         }
 
         protected override void OnUserNavigatedHere()
         {
             base.OnUserNavigatedHere();
-            Editable = LoginData.IsAdmin;
+            UpdateReadonly();
         }
+
+        private void UpdateReadonly() => Readonly = !LoginData.IsAdmin;
 
         private void Write()
         {

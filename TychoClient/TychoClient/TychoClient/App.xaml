@@ -7,6 +7,10 @@
         <ResourceDictionary>
             <converters:IsEmptyOrNullConverter x:Key="IsEmptyOrNullConverter"/>
             <converters:IsEmptyOrNullConverter x:Key="InverseIsEmptyOrNullConverter" Invert="True"/>
+            <converters:ByteToIntConverter x:Key="ByteToIntConverter"/>
+            <converters:InvertBoolConverter x:Key="InvertBoolConverter"/>
+
+
             <!--Global Styles-->
             <Color x:Key="NavigationPrimary">#2196F3</Color>
             <Style TargetType="NavigationPage">

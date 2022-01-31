@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TychoClient.Views.ReadCardPage"
              xmlns:vm="clr-namespace:TychoClient.ViewModels"
+             x:Name="ReadCardPageName"
              Title="{Binding Title}">
     
     <ContentPage.BindingContext>
@@ -31,25 +32,23 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Text="Write to chip" Command="{Binding WriteToTagCommand}" IsVisible="{Binding Editable}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0"/>
-        <Button Text="Clear" BackgroundColor="Red"  Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0,6,6,0"/>
+        <Button Text="Write to chip" BackgroundColor="Gainsboro" Command="{Binding WriteToTagCommand}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0"/>
+        <Button Text="Clear" BackgroundColor="Red"  Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}"/>
 
         <ScrollView Grid.Row="1" Grid.ColumnSpan="2">
             <StackLayout Orientation="Vertical" Padding="16,16,16,40" Spacing="10">
-                <Label Text="Chip UID"  Margin="{StaticResource DistanceLabel}"/>
-                <Label Text="{Binding ChipUid}"/>
 
                 <Label Text="Name"  Margin="{StaticResource DistanceLabel}"/>
-                <Entry Text="{Binding CustomerName}" IsEnabled="{Binding Editable}"/>
+                <Entry Text="{Binding CustomerName}" InputTransparent="{Binding Readonly}" MaxLength="20"/>
 
-                <Label Text="Transaction ID"  Margin="{StaticResource DistanceLabel}"/>
-                <Entry Text="{Binding TransactionId}" IsEnabled="{Binding Editable}"/>
+                <Label Text="Current balance"  Margin="{StaticResource DistanceLabel}"/>
+                <Entry Text="{Binding CurrentBalance}" InputTransparent="True"/>
 
                 <Label Text="Available Drinks"  Margin="{StaticResource DistanceLabel}"/>
-                <Entry Text="{Binding AvailableDrinks}" IsEnabled="{Binding Editable}"/>
+                <Entry Text="{Binding AvailableDrinks}" InputTransparent="{Binding Readonly}" Keyboard="Numeric"/>
 
                 <Label Text="Spent Drinks"  Margin="{StaticResource DistanceLabel}"/>
-                <Entry Text="{Binding SpentAlcoholTokens}" IsEnabled="{Binding Editable}"/>
+                <Entry Text="{Binding SpentAlcoholTokens}" InputTransparent="{Binding Readonly}" Keyboard="Numeric"/>
 
                 <Label Text="Checksum"  Margin="{StaticResource DistanceLabel}"/>
                 <Label Text="{Binding Checksum}">
@@ -69,17 +68,37 @@
                         </Style>
                     </Label.Style>
                 </Label>
+                <Label Text="Chip UID"  Margin="{StaticResource DistanceLabel}"/>
+                <Label Text="{Binding ChipUid}"/>
+                <Label Text="Transaction ID"  Margin="{StaticResource DistanceLabel}"/>
+                <Entry Text="{Binding TransactionId}" InputTransparent="{Binding Readonly}"/>
 
-                <Label Text="Collapsed history"  Margin="{StaticResource DistanceLabel}"/>
-                <Entry Text="{Binding CollapsedHistory}" IsEnabled="{Binding Editable}"/>
+                <Label Text="Collapsed history"  Margin="{StaticResource DistanceLabel}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}"/>
+                <Entry Text="{Binding CollapsedHistory}" InputTransparent="{Binding Readonly}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" Keyboard="Numeric"/>
 
-                <ListView ItemsSource="{Binding Transactions}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Text="Transactions"  Margin="{StaticResource DistanceLabel}"/>
+                    <Button Grid.Column="2" Text="+" FontSize="Large" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" Command="{Binding AddTransactionCommand}"/>
+                </Grid>
+                <ListView ItemsSource="{Binding Transactions}" SelectionMode="None">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackLayout Orientation="Horizontal">
-                                <Label Text="{Binding Sum}"/>
-                                <Label TabIndex="{Binding PartnerByteId}"/>
-                            </StackLayout>
+                            <ViewCell>
+                                <Grid >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Entry Text="{Binding Sum}" InputTransparent="{Binding Path=BindingContext.Readonly, Source={x:Reference Name=ReadCardPageName}}" Keyboard="Numeric"/>
+                                    <Label Text="Tycho Dollars from" Grid.Column="1" VerticalTextAlignment="Center"/>
+                                    <Entry Text="{Binding PartnerByteId}" Grid.Column="2" InputTransparent="{Binding Path=BindingContext.Readonly, Source={x:Reference Name=ReadCardPageName}}" Keyboard="Numeric"/>
+                                </Grid>
+                            </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
