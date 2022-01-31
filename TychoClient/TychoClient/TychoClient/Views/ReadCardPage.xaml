@@ -32,8 +32,40 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Text="Write to chip" BackgroundColor="Gainsboro" Command="{Binding WriteToTagCommand}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0"/>
-        <Button Text="Clear" BackgroundColor="Red"  Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}"/>
+        <Button Text="Write to chip" BackgroundColor="Gainsboro" Command="{Binding WriteToTagCommand}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <DataTrigger TargetType="{x:Type Button}" Binding="{Binding IsWriting}" Value="True">
+                            <Setter Property="BackgroundColor" Value="DarkGray"/>
+                            <Setter Property="Text" Value="Waiting for tag..."/>
+                        </DataTrigger>
+                        <MultiTrigger TargetType="{x:Type Button}">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding IsWriting}" Value="False"/>
+                                <BindingCondition Binding="{Binding Readonly}" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="False"/>
+                        </MultiTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Text="Clear" BackgroundColor="Red"  Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <MultiTrigger TargetType="{x:Type Button}">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding IsWriting}" Value="False"/>
+                                <BindingCondition Binding="{Binding Readonly}" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="False"/>
+                        </MultiTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
 
         <ScrollView Grid.Row="1" Grid.ColumnSpan="2">
             <StackLayout Orientation="Vertical" Padding="16,16,16,40" Spacing="10">
@@ -71,20 +103,32 @@
                 <Label Text="Chip UID"  Margin="{StaticResource DistanceLabel}"/>
                 <Label Text="{Binding ChipUid}"/>
                 <Label Text="Transaction ID"  Margin="{StaticResource DistanceLabel}"/>
-                <Entry Text="{Binding TransactionId}" InputTransparent="{Binding Readonly}"/>
+                <Entry Text="{Binding TransactionId}" InputTransparent="{Binding Readonly}" Keyboard="Numeric"/>
 
                 <Label Text="Collapsed history"  Margin="{StaticResource DistanceLabel}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}"/>
                 <Entry Text="{Binding CollapsedHistory}" InputTransparent="{Binding Readonly}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" Keyboard="Numeric"/>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Label Text="Transactions"  Margin="{StaticResource DistanceLabel}"/>
+                    <Button Grid.Column="1" Text="Remove selected" Command="{Binding DeleteTransactionCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Style.Triggers>
+                                    <DataTrigger TargetType="{x:Type Button}" Binding="{Binding SelectedTransaction, Converter={StaticResource IsEmptyOrNullConverter}}" Value="True">
+                                        <Setter Property="IsVisible" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button Grid.Column="2" Text="+" FontSize="Large" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" Command="{Binding AddTransactionCommand}"/>
                 </Grid>
-                <ListView ItemsSource="{Binding Transactions}" SelectionMode="None">
+                <ListView ItemsSource="{Binding Transactions}" SelectedItem="{Binding SelectedTransaction}" SelectionMode="None" x:Name="transactionsList">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
@@ -101,6 +145,15 @@
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
+                    <ListView.Style>
+                        <Style TargetType="{x:Type ListView}">
+                            <Style.Triggers>
+                                <DataTrigger TargetType="{x:Type ListView}" Binding="{Binding Readonly}" Value="False">
+                                    <Setter Property="SelectionMode" Value="Single"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.Style>
                 </ListView>
 
 

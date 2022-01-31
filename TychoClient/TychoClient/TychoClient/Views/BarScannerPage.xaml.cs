@@ -1,5 +1,7 @@
 ﻿using System;
-
+using System.Linq;
+using TychoClient.Models;
+using TychoClient.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -11,6 +13,8 @@ namespace TychoClient.Views
         public BarScannerPage()
         {
             InitializeComponent();
+            if (BindingContext is NfcAwareViewModel vm)
+                vm.Watcher = AllSelectionWatchers.List.FirstOrDefault(w => w.WatchedMenuItem == MenuItemType.BarMode);
         }
     }
 }

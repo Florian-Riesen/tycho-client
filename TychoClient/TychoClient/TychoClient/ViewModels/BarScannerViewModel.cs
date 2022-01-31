@@ -17,14 +17,9 @@ namespace TychoClient.ViewModels
             set
             {
                 SetProperty(ref _tokensToBeCharged, value);
-                if (value == 0)
-                {
-                    // remove from write queue
-                }
-                else
-                {
-                    // update entry in write queue
-                }
+                CustomerName = "";
+                PaymentRejected = false;
+                PaymentSucceeded = false;
             }
         }
 
@@ -42,8 +37,8 @@ namespace TychoClient.ViewModels
             private set => SetProperty(ref _rejected, value);
         }
 
-        private string _succeeded;
-        public string PaymentSucceeded
+        private bool _succeeded;
+        public bool PaymentSucceeded
         {
             get => _succeeded;
             private set => SetProperty(ref _succeeded, value);
@@ -63,12 +58,31 @@ namespace TychoClient.ViewModels
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
-            // base.OnRead(e);
+            if(e.Data is null)
+            {
+                TokensToBeCharged = 0;
+                CustomerName = "ERROR: CARD EMPTY";
+                PaymentRejected = true;
+                PaymentSucceeded = false;
+                return;
+            }
 
-            // call of this method means we attempted to charge tokens
+            if(e.Data.AvailableAlcoholTokens < TokensToBeCharged)
+            {
+                TokensToBeCharged = 0;
+                CustomerName = e.Data.CustomerName;
+                PaymentRejected = true;
+                PaymentSucceeded = false;
+                return;
+            }
 
+            e.Data.AvailableAlcoholTokens = (byte)(e.Data.AvailableAlcoholTokens - TokensToBeCharged);
+            e.Data.SpentAlcoholTokens = (byte)(e.Data.SpentAlcoholTokens + TokensToBeCharged);
+            TokensToBeCharged = 0;
             CustomerName = e.Data.CustomerName;
-
+            DataToWrite = e.Data;
+            PaymentSucceeded = true;
+            PaymentRejected = false;
         }
     }
 }

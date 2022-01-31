@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -11,12 +9,22 @@ namespace TychoClient.ViewModels
 {
     public class ReadCardViewModel : NfcAwareViewModel
     {
+        #region Properties
+        private Transaction _selectedTransaction;
+        public Transaction SelectedTransaction
+        {
+            get => _selectedTransaction;
+            set => SetProperty(ref _selectedTransaction, value);
+        }
+
         private bool _readonly;
         public bool Readonly
         {
             get => _readonly;
             set => SetProperty(ref _readonly, value);
         }
+
+        public bool IsWriting => DataToWrite != null;
 
         private bool? _checksumMatches;
         public bool? ChecksumMatches
@@ -85,11 +93,14 @@ namespace TychoClient.ViewModels
             get => _collapsedHistory;
             set => SetProperty(ref _collapsedHistory, value);
         }
+        #endregion Properties
 
-
+        #region Commands
         public ICommand ClearFormCommand { get; }
         public ICommand WriteToTagCommand { get; }
         public ICommand AddTransactionCommand { get; }
+        public ICommand DeleteTransactionCommand { get; }
+        #endregion Commands
 
         public ReadCardViewModel()
         {
@@ -97,27 +108,16 @@ namespace TychoClient.ViewModels
             WriteToTagCommand = new Command(Write);
             ClearFormCommand = new Command(ClearForm);
             AddTransactionCommand = new Command(() => Transactions.Add(new Transaction()));
+            DeleteTransactionCommand = new Command(DeleteTransaction);
             UpdateReadonly();
             Transactions.CollectionChanged += (s,e) => OnPropertyChanged(nameof(CurrentBalance));
         }
+
         
-        private void ClearForm()
-        {
-            ChipUid = "";
-            CustomerName = "";
-            TransactionId = "";
-            AvailableDrinks = "";
-            SpentAlcoholTokens = "";
-            Checksum = "";
-            CollapsedHistory = "";
-            ChecksumMatches = null;
-
-            Transactions.Clear();
-        }
-
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
             UpdateReadonly();
+            OnPropertyChanged(nameof(IsWriting));
             Log.Line("ReadCardVm: Card scanned!");
             if (e.Data is null)
             {
@@ -144,16 +144,28 @@ namespace TychoClient.ViewModels
         protected override void OnUserNavigatedHere()
         {
             base.OnUserNavigatedHere();
+            ClearForm();
             UpdateReadonly();
         }
 
         private void UpdateReadonly() => Readonly = !LoginData.IsAdmin;
 
+        #region Command Methods
         private void Write()
         {
+            if(IsWriting)
+            {
+                DataToWrite = null;
+                OnPropertyChanged(nameof(IsWriting));
+                Readonly = false;
+                return;
+            }
+
+            Readonly = true;
+
             var data = new FreeloaderCustomerData()
             {
-                ChipUid = ChipUid.Split(':').Select(sb => Byte.Parse(sb)).ToArray(),
+                ChipUid = ChipUid.Split(':').Select(sb => byte.Parse(sb)).ToArray(),
                 CustomerName = CustomerName,
             };
 
@@ -167,7 +179,32 @@ namespace TychoClient.ViewModels
 
             data.Fletcher32Checksum = data.CalculateFletcher32(LoginData.Password);
             DataToWrite = data;
+            OnPropertyChanged(nameof(IsWriting));
             Log.Line("ReadCardVm: Prepared Data for write!");
         }
+
+        private void DeleteTransaction()
+        {
+            Transactions.Remove(SelectedTransaction);
+            SelectedTransaction = null;
+        }
+
+        private void ClearForm()
+        {
+            ChipUid = "";
+            CustomerName = "";
+            TransactionId = "";
+            AvailableDrinks = "";
+            SpentAlcoholTokens = "";
+            Checksum = "";
+            CollapsedHistory = "";
+            ChecksumMatches = null;
+            DataToWrite = null;
+            OnPropertyChanged(nameof(IsWriting));
+
+            Transactions.Clear();
+        }
+
+        #endregion Command Methods
     }
 }
