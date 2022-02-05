@@ -22,6 +22,7 @@
 
         <Style TargetType="{x:Type Label}">
             <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
+            <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
         </Style>
 
         <Style TargetType="{x:Type Button}" x:Key="ButtonStyle">
