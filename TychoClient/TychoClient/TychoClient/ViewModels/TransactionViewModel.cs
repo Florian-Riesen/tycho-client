@@ -12,11 +12,11 @@ namespace TychoClient.ViewModels
         private byte losingCreditsTransactionId;
         private byte receivingCreditsTransactionId;
 
-        private TransactionState _state = TransactionState.WaitingForInput;
+        private TransactionState _state;
         public TransactionState State
         {
             get => _state;
-            set { _state = value;
+            set { SetProperty(ref _state, value);
                 switch (value)
                 {
                     case TransactionState.WaitingForInput:
@@ -54,16 +54,27 @@ namespace TychoClient.ViewModels
         }
 
 
-        public ICommand StartTransactionCommand { get; }
-        public ICommand AbortTransactionCommand { get; }
-        public ICommand FinishAcknowledgedCommand { get; }
+        public ICommand ButtonCommand { get; }
 
         public TransactionViewModel()
         {
             Title = "Charge money to another card";
-            StartTransactionCommand = new Command(() => State = TransactionState.WaitingForChargee);
-            AbortTransactionCommand = new Command(() => { State = TransactionState.WaitingForInput; Amount = 0; });
-            FinishAcknowledgedCommand = new Command(() => State = TransactionState.WaitingForInput);
+            ButtonCommand = new Command(ButtonPressed);
+            State = TransactionState.WaitingForInput;
+        }
+
+        private void ButtonPressed()
+        {
+            if (State == TransactionState.WaitingForInput)
+                State = TransactionState.WaitingForChargee;
+            else if (State == TransactionState.Finished)
+                State = TransactionState.WaitingForInput;
+            else
+            {
+                State = TransactionState.WaitingForInput;
+                Amount = 0;
+            }
+                
         }
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
@@ -92,7 +103,6 @@ namespace TychoClient.ViewModels
                 e.Data.AddToCard(Amount, losingCreditsTransactionId);
                 State = TransactionState.WaitingForFinalization;
                 DataToWrite = e.Data;
-                Amount = 0;
                 return;
             }
 
@@ -101,6 +111,7 @@ namespace TychoClient.ViewModels
             {
                 e.Data.FinalizeTransaction(receivingCreditsTransactionId);
                 State = TransactionState.Finished;
+                Amount = 0;
                 DataToWrite = e.Data;
                 return;
             }

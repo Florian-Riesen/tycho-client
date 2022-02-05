@@ -3,7 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TychoClient.Views.TransactionPage"
              xmlns:vm="clr-namespace:TychoClient.ViewModels"
-             Title="{Binding Title}">
+             
+             xmlns:Effects="clr-namespace:TychoClient.Effects"  
+
+             Title="{Binding Title}" BackgroundColor="Black">
     
     <ContentPage.BindingContext>
         <vm:TransactionViewModel />
@@ -17,17 +20,21 @@
             <Color x:Key="LightTextColor">#999999</Color>
         </ResourceDictionary>
 
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
+        </Style>
+
         <Style TargetType="{x:Type Button}" x:Key="ButtonStyle">
+            <Setter Property="BackgroundColor" Value="Red"/>
+            <Setter Property="Text" Value="ABORT TRANSACTION"/>
             <Style.Triggers>
                 <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="WaitingForInput">
                     <Setter Property="Text" Value="Start transaction now"/>
-                    <Setter Property="Command" Value="{Binding StartTransactionCommand}"/>
-                    <Setter Property="BackgroundColor" Value="Gray"/>
+                    <Setter Property="BackgroundColor" Value="LightGray"/>
                 </DataTrigger>
                 <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="Finished">
                     <Setter Property="Text" Value="Ok"/>
-                    <Setter Property="Command" Value="{Binding FinishAcknowledgedCommand}"/>
-                    <Setter Property="BackgroundColor" Value="Gray"/>
+                    <Setter Property="BackgroundColor" Value="Green"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -39,15 +46,22 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Label Text="{Binding Prompt}"/>
-        
-        <Button Grid.Row="1" Style="{StaticResource ButtonStyle}" Text="ABORT TRANSACTION" BackgroundColor="Red" Command="{Binding AbortTransactionCommand}"/>
+        <Label Text="{Binding Prompt}" Margin="5" FontSize="Medium" >
+            <Label.Effects>
+                <Effects:ShadowEffect Radius="5" DistanceX="5" DistanceY="5" Color="Red"/>
+                <!--<Effects:ShadowEffect Radius="5" DistanceX="5" DistanceY="0" Color="OrangeRed"/>
+                <Effects:ShadowEffect Radius="5" DistanceX="5" DistanceY="0" Color="OrangeRed"/>-->
+            </Label.Effects>
+        </Label>
 
-        <Entry Text="{Binding Amount}" Keyboard="Numeric" Placeholder="Amount"/>
+        <Button Grid.Row="1" Style="{StaticResource ButtonStyle}" Command="{Binding ButtonCommand}"/>
 
-        <ScrollView Grid.Row="2"></ScrollView>
+        <Entry Grid.Row="2" Text="{Binding Amount}" Keyboard="Numeric" Placeholder="Amount" TextColor="Wheat"/>
+
+        <ScrollView Grid.Row="3"></ScrollView>
     </Grid>
 </ContentPage>

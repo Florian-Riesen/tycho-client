@@ -10,6 +10,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\OFL.txt" />
+    <None Remove="Fonts\Play-Bold.ttf" />
+    <None Remove="Fonts\Play-Regular.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Fonts\OFL.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\Play-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Fonts\Play-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Plugin.NFC" Version="0.1.20" />
     <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />  
