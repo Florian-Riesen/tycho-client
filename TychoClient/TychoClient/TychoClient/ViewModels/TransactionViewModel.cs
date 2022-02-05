@@ -88,6 +88,7 @@ namespace TychoClient.ViewModels
             if(_state == TransactionState.WaitingForCharger && !Enumerable.SequenceEqual(e.Data.ChipUid, losingCreditsUid))
             {
                 receivingCreditsUid = e.Data.ChipUid;
+                receivingCreditsTransactionId = e.Data.ByteId;
                 e.Data.AddToCard(Amount, losingCreditsTransactionId);
                 State = TransactionState.WaitingForFinalization;
                 DataToWrite = e.Data;
@@ -100,6 +101,7 @@ namespace TychoClient.ViewModels
             {
                 e.Data.FinalizeTransaction(receivingCreditsTransactionId);
                 State = TransactionState.Finished;
+                DataToWrite = e.Data;
                 return;
             }
 

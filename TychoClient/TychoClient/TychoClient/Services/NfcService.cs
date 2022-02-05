@@ -12,12 +12,24 @@ namespace TychoClient.Services
 {
     public class NfcService
     {
+        private Dictionary<byte[], FreeloaderCustomerData> _emergencyCache = new Dictionary<byte[], FreeloaderCustomerData>();
+
         private static NfcService _instance;
         private List<Byte> _lastPayload;
+        private FreeloaderCustomerData _dataToWrite;
 
         protected INFC Nfc => CrossNFC.Current;
 
-        public FreeloaderCustomerData DataToWrite { get; set; }
+        public FreeloaderCustomerData DataToWrite
+        {
+            get => _dataToWrite;
+            set
+            {
+                _dataToWrite = value;
+                if(value != null)
+                    UpdateEmergencyCache(value);
+            }
+        }
 
         public static NfcService GetInstance()
         {
@@ -62,46 +74,53 @@ namespace TychoClient.Services
 
         private void Current_OnTagDiscovered(ITagInfo tagInfo, bool format)
         {
-            this.Log("NFCService: TAG DISCOVERED!");
+            this.Log("TAG DISCOVERED!");
+            var parsedData = ParseDataFromTag(tagInfo);
+
+            if (parsedData is null && _emergencyCache.ContainsKey(tagInfo.Identifier))
+            {
+                this.Log("Cache hit - ALERT! TAG WAS MISTAKENLY DELETED! Trying to restore it.");
+                var dataToWriteTemp = DataToWrite;
+                DataToWrite = parsedData = _emergencyCache[tagInfo.Identifier];
+                WriteToTag(tagInfo);
+                DataToWrite = dataToWriteTemp;
+            }
 
             if (DataToWrite == null)
             {
                 this.Log("NFCService: There is no data to write. Reading first and giving the VM a change to react.");
-                ReadTag(tagInfo);
-                WriteTag(tagInfo);
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { Data = parsedData, MetaData = tagInfo });
+                WriteToTag(tagInfo);
             }
             else
             {
                 this.Log("NFCService: There is some data to write! Writing first and then sending out the resulting Data.");
-                this.Log("NFCService: Data to write:" + DataToWrite.ToJson());
-                WriteTag(tagInfo);
-                ReadTag(tagInfo);
+                var oldDataToWrite = DataToWrite;
+                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { Data = WriteToTag(tagInfo) ? oldDataToWrite : parsedData, MetaData = tagInfo });
             }
 
             Nfc.StartPublishing();
         }
 
-        private void WriteTag(ITagInfo tagInfo)
+        private bool WriteToTag(ITagInfo tagInfo)
         {
-            bool recover = false;
-
             if (DataToWrite == null)
             {
-                this.Log("NFCService: There is no data to write.");
-                return;
+                this.Log("There is no data to write.");
+                return false;
             }
 
             if (!Enumerable.SequenceEqual(DataToWrite.ChipUid, tagInfo.Identifier))
             {
                 this.Log($"NFCService: The Data to write does not target the presented tag. ID of presented tag: {string.Join(":", tagInfo.Identifier)}, ID of waiting data: {string.Join(":", DataToWrite.ChipUid)}");
-                return;
+                return false;
             }
 
-            this.Log("NFCService: There is some data to write.");
+            this.Log("There is some data to write.");
 
             var bytes = DataToWrite.ToBytes();
 
-            this.Log("NFCService: Data as bytes: " + string.Join(":", bytes));
+            this.Log("Data as bytes: " + string.Join(":", bytes));
             tagInfo.Records = new[] {
                     new NFCNdefRecord
                     {
@@ -109,75 +128,74 @@ namespace TychoClient.Services
                         MimeType = "a/c",
                         Payload = bytes
                     }};
-
-            this.Log("NFCService: Data as bytes in Record: " + string.Join(":", tagInfo.Records[0].Payload));
-            this.Log("NFCService: Data as JSON: " + DataToWrite.ToJson());
+            
             _lastPayload = tagInfo.Records[0].Payload.ToList();
 
-            Device.BeginInvokeOnMainThread(() =>
+            try
             {
-                try
+                if (DataToWrite != null) // sometimes this part gets called in an invalid state
                 {
-                    if (DataToWrite != null) // sometimes this part gets called in an invalid state
-                    {
-                        this.Log("NFCService: Publishing RFID message now.");
-                        Nfc.PublishMessage(tagInfo, false);
-                    }
-                    else
-                        this.Log("NFCService: Invalid state. Not publishing any RFID message.");
-
-                    this.Log("NFCService: Written successfully!");
-                    DataToWrite = null;
-                    FreeloaderCardWritten?.Invoke(this, new RfidEventArgs() { Data = DataToWrite, MetaData = tagInfo });
+                    this.Log("NFCService: Publishing RFID message now.");
+                    Nfc.PublishMessage(tagInfo, false);
                 }
-                catch (Exception ex)
+                else
                 {
-
-                    this.Log("NFCService: Tag IO Error: " + ex.ToString());
-
-                    this.Log("Possibly the tag just got deleted! Content still in memory: " + FreeloaderCustomerData.FromBytes(tagInfo.Identifier, bytes).ToJson());
-                    //Debugger.Break();
-                    recover = true;
-                    this.Log("Trying to recover.");
+                    this.Log("Invalid state. Not publishing any RFID message.");
+                    return false;
                 }
-            });
 
-            if (recover)
-                WriteTag(tagInfo);
+                this.Log("NFCService: Written successfully!");
+                DataToWrite = null;
+                FreeloaderCardWritten?.Invoke(this, new RfidEventArgs() { Data = DataToWrite, MetaData = tagInfo });
+            }
+            catch (Exception ex)
+            {
+                this.Log("NFCService: Tag IO Error: " + ex.ToString());
+                this.Log("Possibly the tag just got deleted! Content still in memory.");
+                return false;
+            }
+            return true;
         }
 
-        private void ReadTag(ITagInfo tagInfo)
+        private FreeloaderCustomerData ParseDataFromTag(ITagInfo tagInfo)
         {
             if (tagInfo.Records == null)
             {
-                this.Log("NfcService: Tag contains no records. No data to parse.");
-                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
-                return;
+                this.Log("Tag contains no records.");
+                return null;
             }
 
             if (tagInfo.Records.Length != 1)
             {
                 this.Log($"NFCService: Error: Chip contains {tagInfo.Records?.Length} records instead of exactly 1.");
-                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
-                return;
+                return null;
             }
             var message = tagInfo.Records[0].Payload;
-
-            if (_lastPayload != null)
-                this.Log("NfcService: Previously Written Bytes: \r\n" + string.Join(":", _lastPayload));
-            this.Log("NfcService: Read Bytes: \r\n" + string.Join(":", message));
 
             try
             {
                 var data = FreeloaderCustomerData.FromBytes(tagInfo.Identifier, message);
-                this.Log("NFCService: Freeloader block deserialized!");
-                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { Data = data, MetaData = tagInfo });
+                UpdateEmergencyCache(data);
+                this.Log("Freeloader data deserialized.");
+                return data;
             }
             catch (Exception e)
             {
-                this.Log("NFCService: Error while reading NFC!" + e.ToString());
-                FreeloaderCardScanned?.Invoke(this, new RfidEventArgs() { MetaData = tagInfo });
+                this.Log("Error while parsing tag content!" + e.ToString());
+                return null;
             }
+
+        }
+
+        private void UpdateEmergencyCache(FreeloaderCustomerData data)
+        {
+            if (data is null)
+                return;
+            
+            if (_emergencyCache.ContainsKey(data.ChipUid))
+                _emergencyCache[data.ChipUid] = data;
+            else
+                _emergencyCache.Add(data.ChipUid, data);
         }
     }
 
