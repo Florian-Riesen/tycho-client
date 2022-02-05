@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using TychoClient.Services;
 
 namespace TychoClient.Models
@@ -14,17 +15,35 @@ namespace TychoClient.Models
         BarMode,
         Transaction
     }
-    public class HomeMenuItem
+    public class HomeMenuItem : INotifyPropertyChanged
     {
+        private bool _isVisible = true;
+
         public MenuItemType Id { get; set; }
 
         public string Title { get; set; }
 
         public SelectionWatcher Watcher { get; set; }
 
-        public bool IsVisible { get; set; } = true;
-
+        public bool IsVisible
+        {
+            get => _isVisible; set
+            {
+                _isVisible = value;
+                OnPropertyChanged(nameof(IsVisible));
+            }
+        }
         public bool AdminOnly { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            var changed = PropertyChanged;
+            if (changed == null)
+                return;
+
+            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class SelectionWatcher

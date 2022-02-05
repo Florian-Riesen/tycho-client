@@ -1,7 +1,3 @@
-using Plugin.NFC;
-using System;
-using System.Linq;
-using System.Text;
 using System.Windows.Input;
 using TychoClient.Services;
 using Xamarin.Forms;
@@ -58,7 +54,15 @@ namespace TychoClient.ViewModels
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
-            if(e.Data is null)
+            if (!LoginData.IsAdmin)
+            {
+                TokensToBeCharged = 0;
+                CustomerName = "ERROR: NO ADMIN PERMISSIONS ON SCANNER. Login as admin!";
+                PaymentRejected = true;
+                PaymentSucceeded = false;
+                return;
+            }
+            if (e.Data is null)
             {
                 TokensToBeCharged = 0;
                 CustomerName = "ERROR: CARD EMPTY";

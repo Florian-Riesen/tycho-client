@@ -9,9 +9,19 @@
                     HasUnevenRows="True">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <ViewCell>
+                    <ViewCell x:Name="ViewCell">
                         <Grid Padding="10" IsVisible="{Binding IsVisible}">
                             <Label Text="{Binding Title}" FontSize="20"/>
+                            <Grid.Style>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Style.Triggers>
+                                        <DataTrigger TargetType="{x:Type Grid}" Binding="{Binding IsVisible}" Value="False">
+                                            <Setter Property="HeightRequest" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
                         </Grid>
                     </ViewCell>
                 </DataTemplate>
