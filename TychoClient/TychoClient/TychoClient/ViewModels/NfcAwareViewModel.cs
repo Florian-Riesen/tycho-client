@@ -69,7 +69,7 @@ namespace TychoClient.ViewModels
 
         private void Nfc_FreeloaderCardScanned(object sender, RfidEventArgs e)
         {
-            if (Watcher.IsSelected)
+            if (Watcher?.IsSelected ?? false)
                 OnFreeloaderCardScanned(e);
         }
 

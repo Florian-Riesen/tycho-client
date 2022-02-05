@@ -21,6 +21,10 @@ namespace TychoClient.Models
         public string Title { get; set; }
 
         public SelectionWatcher Watcher { get; set; }
+
+        public bool IsVisible { get; set; } = true;
+
+        public bool AdminOnly { get; set; }
     }
 
     public class SelectionWatcher
@@ -38,12 +42,12 @@ namespace TychoClient.Models
             {
                 if (value)
                 {
-                    Log.Line($"{Enum.GetName(typeof(MenuItemType), WatchedMenuItem)}Watcher reports Selection!");
+                    this.Log($"{Enum.GetName(typeof(MenuItemType), WatchedMenuItem)}Watcher reports Selection!");
                     GotSelected?.Invoke(this, new EventArgs());
                 }
                 else
                 {
-                    Log.Line($"{Enum.GetName(typeof(MenuItemType), WatchedMenuItem)}Watcher reports Deselection!");
+                    this.Log($"{Enum.GetName(typeof(MenuItemType), WatchedMenuItem)}Watcher reports Deselection!");
                     GotDeselected?.Invoke(this, new EventArgs());
                 }
 
@@ -58,7 +62,7 @@ namespace TychoClient.Models
 
         public SelectionWatcher(MenuItemType watchedItem)
         {
-            Log.Line("Creating new SelectionWatcher for " + Enum.GetName(typeof(MenuItemType), watchedItem));
+            this.Log("Creating new SelectionWatcher for " + Enum.GetName(typeof(MenuItemType), watchedItem));
             WatchedMenuItem = watchedItem;
             AllSelectionWatchers.List.Add(this);
         }

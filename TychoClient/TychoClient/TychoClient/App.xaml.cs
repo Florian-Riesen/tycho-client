@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using TychoClient.Views;
+using TychoClient.Services;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace TychoClient
@@ -13,7 +14,7 @@ namespace TychoClient
         {
             InitializeComponent();
 
-
+            this.Log("Creating MainPage.");
             MainPage = new MainPage();
         }
 

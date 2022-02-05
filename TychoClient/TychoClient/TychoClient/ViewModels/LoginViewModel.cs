@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -74,8 +75,30 @@ namespace TychoClient.ViewModels
 
     public static class LoginData
     {
-        public static string Username { get; set; } = "";
+        private static string _username = "";
+        private static bool s_isAdmin;
+
+        public static string Username
+        {
+            get => _username;
+            set
+            {
+                _username = value;
+                UsernameChanged?.Invoke(Username, new EventArgs());
+            }
+        }
         public static string Password { get; set; } = "";
-        public static bool IsAdmin { get; set; }
+        public static bool IsAdmin
+        {
+            get => s_isAdmin;
+            set
+            {
+                s_isAdmin = value;
+                AdminStatusChanged?.Invoke(null, new EventArgs());
+            }
+        }
+
+        public static event EventHandler UsernameChanged;
+        public static event EventHandler AdminStatusChanged;
     }
 }

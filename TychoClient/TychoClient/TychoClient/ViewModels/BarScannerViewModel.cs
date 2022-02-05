@@ -67,7 +67,9 @@ namespace TychoClient.ViewModels
                 return;
             }
 
-            if(e.Data.AvailableAlcoholTokens < TokensToBeCharged)
+            var returnCode = e.Data.PurchaseAlcohol(TokensToBeCharged, LoginData.Password);
+
+            if (returnCode != 0)
             {
                 TokensToBeCharged = 0;
                 CustomerName = e.Data.CustomerName;

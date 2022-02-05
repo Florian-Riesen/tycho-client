@@ -118,13 +118,13 @@ namespace TychoClient.ViewModels
         {
             UpdateReadonly();
             OnPropertyChanged(nameof(IsWriting));
-            Log.Line("ReadCardVm: Card scanned!");
+            this.Log("ReadCardVm: Card scanned!");
             if (e.Data is null)
             {
-                Log.Line("ReadCardVm: No data in scan!");
+                this.Log("ReadCardVm: No data in scan!");
                 ClearForm();
                 ChipUid = string.Join(":", e.MetaData.Identifier);
-                Log.Line($"ReadCardVm: Read UID {ChipUid} from metadata.");
+                this.Log($"ReadCardVm: Read UID {ChipUid} from metadata.");
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace TychoClient.ViewModels
             data.Fletcher32Checksum = data.CalculateFletcher32(LoginData.Password);
             DataToWrite = data;
             OnPropertyChanged(nameof(IsWriting));
-            Log.Line("ReadCardVm: Prepared Data for write!");
+            this.Log("ReadCardVm: Prepared Data for write!");
         }
 
         private void DeleteTransaction()

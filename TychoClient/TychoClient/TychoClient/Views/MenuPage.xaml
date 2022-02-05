@@ -4,12 +4,13 @@
              x:Class="TychoClient.Views.MenuPage"
              Title="Menu">
     <StackLayout VerticalOptions="FillAndExpand">
+        <Label x:Name="greetingLabel" FontSize="Large"/>
         <ListView x:Name="ListViewMenu"
                     HasUnevenRows="True">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid Padding="10">
+                        <Grid Padding="10" IsVisible="{Binding IsVisible}">
                             <Label Text="{Binding Title}" FontSize="20"/>
                         </Grid>
                     </ViewCell>

@@ -7,6 +7,7 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Plugin.NFC;
+using TychoClient.Services;
 using Android.Content;
 
 namespace TychoClient.Droid
@@ -16,6 +17,8 @@ namespace TychoClient.Droid
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            this.Log("OnCreate called. Loading application.");
+
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
