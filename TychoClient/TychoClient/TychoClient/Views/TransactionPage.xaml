@@ -3,45 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TychoClient.Views.TransactionPage"
              xmlns:vm="clr-namespace:TychoClient.ViewModels"
-             
-             xmlns:Effects="clr-namespace:TychoClient.Effects"  
-
-             Title="{Binding Title}" BackgroundColor="Black">
+             Title="{Binding Title}">
     
     <ContentPage.BindingContext>
         <vm:TransactionViewModel />
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>
-        <ResourceDictionary>
-            <!--Page Level Resources: Compatible with Xamarin Live Player -->
-            <Color x:Key="Primary">#2196F3</Color>
-            <Color x:Key="Accent">#96d1ff</Color>
-            <Color x:Key="LightTextColor">#999999</Color>
-        </ResourceDictionary>
 
-        <Style TargetType="{x:Type Label}">
-            <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
-            <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
-        </Style>
-
-        <Style TargetType="{x:Type Button}" x:Key="ButtonStyle">
+        <Style TargetType="{x:Type Button}" x:Key="ButtonStyle" BasedOn="{StaticResource Style.Button.Implicit}">
             <Setter Property="BackgroundColor" Value="Red"/>
             <Setter Property="Text" Value="ABORT TRANSACTION"/>
             <Style.Triggers>
                 <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="WaitingForInput">
                     <Setter Property="Text" Value="Start transaction now"/>
-                    <Setter Property="BackgroundColor" Value="LightGray"/>
+                    <Setter Property="BackgroundColor" Value="#f37921"/>
                 </DataTrigger>
                 <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="Finished">
                     <Setter Property="Text" Value="Ok"/>
+
                     <Setter Property="BackgroundColor" Value="Green"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </ContentPage.Resources>
-    
-    
 
     <Grid>
         <Grid.RowDefinitions>
@@ -51,18 +36,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Label Text="{Binding Prompt}" Margin="5" FontSize="Medium" >
-            <Label.Effects>
-                <Effects:ShadowEffect Radius="5" DistanceX="5" DistanceY="5" Color="Red"/>
-                <!--<Effects:ShadowEffect Radius="5" DistanceX="5" DistanceY="0" Color="OrangeRed"/>
-                <Effects:ShadowEffect Radius="5" DistanceX="5" DistanceY="0" Color="OrangeRed"/>-->
-            </Label.Effects>
-        </Label>
+        <Label Text="{Binding Prompt}" Margin="5" FontSize="Medium" />
 
-        <Button Grid.Row="1" Style="{StaticResource ButtonStyle}" Command="{Binding ButtonCommand}"/>
+        <Button Grid.Row="1" Margin="5" Style="{StaticResource ButtonStyle}" Command="{Binding ButtonCommand}"/>
 
-        <Entry Grid.Row="2" Text="{Binding Amount}" Keyboard="Numeric" Placeholder="Amount" TextColor="Wheat"/>
+        <Entry Grid.Row="2" Text="{Binding Amount}" Keyboard="Numeric" FontFamily="Play-Regular.ttf#Play" Placeholder="Amount"/>
 
-        <ScrollView Grid.Row="3"></ScrollView>
     </Grid>
 </ContentPage>

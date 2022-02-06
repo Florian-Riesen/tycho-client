@@ -18,12 +18,24 @@ namespace TychoClient.Models
     public class HomeMenuItem : INotifyPropertyChanged
     {
         private bool _isVisible = true;
+        private bool _isSelected;
 
         public MenuItemType Id { get; set; }
 
         public string Title { get; set; }
 
         public SelectionWatcher Watcher { get; set; }
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                Watcher.IsSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
+            }
+        }
 
         public bool IsVisible
         {
@@ -34,6 +46,8 @@ namespace TychoClient.Models
             }
         }
         public bool AdminOnly { get; set; }
+
+        //public void NotifySelectedChanged() => OnPropertyChanged(nameof(IsSelected));
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")

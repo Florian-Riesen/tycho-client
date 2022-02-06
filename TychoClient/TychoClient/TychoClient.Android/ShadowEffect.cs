@@ -25,16 +25,19 @@ namespace TychoClient.Droid
         {
             try
             {
-                var control = Control as Android.Widget.TextView;
                 var effect = (TychoClient.Effects.ShadowEffect)Element.Effects.FirstOrDefault(e => e is Effects.ShadowEffect);
                 if (effect != null)
                 {
-                    float radius = effect.Radius;
-                    float distanceX = effect.DistanceX;
-                    float distanceY = effect.DistanceY;
-                    Android.Graphics.Color color = effect.Color.ToAndroid();
-                    control.SetShadowLayer(radius, distanceX, distanceY, color);
-                    
+                    float radius = effect.IsDefaultShadow ? 5 : effect.Radius;
+                    float distanceX = effect.IsDefaultShadow ? 5 : effect.DistanceX; ;
+                    float distanceY = effect.IsDefaultShadow ? 5 : effect.DistanceY; ;
+                    Android.Graphics.Color color = effect.IsDefaultShadow ? new Android.Graphics.Color(255, 42, 0) : effect.Color.ToAndroid();
+                    if (Control is TextView txt)
+                        txt.SetShadowLayer(radius, distanceX, distanceY, color);
+                    else if (Control is Android.Widget.Button button)
+                        button.SetShadowLayer(radius, distanceX, distanceY, color);
+                    else
+                    { }
                 }
             }
             catch (Exception ex)

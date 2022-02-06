@@ -37,6 +37,8 @@ namespace TychoClient.Views
                 new HomeMenuItem {Id = MenuItemType.Login, Title="Login", Watcher = new SelectionWatcher(MenuItemType.Login) }
             };
 
+            menuItems.First().IsSelected = true;
+
             ListViewMenu.ItemsSource = menuItems;
 
             ListViewMenu.SelectedItem = menuItems[0];
@@ -52,8 +54,12 @@ namespace TychoClient.Views
                 this.Log($"Selected Menu item changed from {(oldSelectedItem is null ? "None" : Enum.GetName(typeof(MenuItemType), oldSelectedItem.Watcher.WatchedMenuItem))} to {Enum.GetName(typeof(MenuItemType), newSelectedItem.Watcher.WatchedMenuItem)}");
 
                 if(oldSelectedItem != null)
-                    oldSelectedItem.Watcher.IsSelected = false;
-                newSelectedItem.Watcher.IsSelected = true;
+                {
+                    oldSelectedItem.IsSelected = false;
+                }
+
+                newSelectedItem.IsSelected = true;
+
                 try
                 {
                     this.Log("Navigating now");

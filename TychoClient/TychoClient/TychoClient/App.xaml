@@ -2,6 +2,8 @@
 <Application xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:TychoClient.Converters"
+             xmlns:Effects="clr-namespace:TychoClient.Effects"  
+             xmlns:attached="clr-namespace:TychoClient.AttachedProperties"  
              x:Class="TychoClient.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -12,11 +14,36 @@
 
 
             <!--Global Styles-->
-            <Color x:Key="NavigationPrimary">#2196F3</Color>
-            <Style TargetType="NavigationPage">
-                <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
-                <Setter Property="BarTextColor" Value="White" />
+            <Color x:Key="NavigationPrimary">Orange</Color>
+
+            <Style TargetType="{x:Type NavigationPage}">
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <!--<Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />-->
+                <Setter Property="BarTextColor" Value="Black" />
+                <Setter Property="attached:Attached.HasShadow" Value="True"/>
             </Style>
+
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
+                <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
+                <Setter Property="attached:Attached.HasShadow" Value="True"/>
+            </Style>
+
+            <Style TargetType="{x:Type Entry}">
+                <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
+                <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
+                <Setter Property="attached:Attached.HasShadow" Value="True"/>
+            </Style>
+            
+            
+
+            <Style TargetType="{x:Type Button}" x:Key="Style.Button.Implicit">
+                <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
+                <Setter Property="attached:Attached.HasShadow" Value="True"/>
+            </Style>
+
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Style.Button.Implicit}"/>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

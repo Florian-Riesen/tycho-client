@@ -7,6 +7,8 @@ namespace TychoClient.Effects
 {
     public class ShadowEffect : RoutingEffect
     {
+        public bool IsDefaultShadow { get; set; } = true;
+
         public float Radius { get; set; }
 
         public Color Color { get; set; }
