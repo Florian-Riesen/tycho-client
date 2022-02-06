@@ -32,7 +32,8 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
+        
+        <!--#region admin header-->
         <Button Text="Write to chip" BackgroundColor="Gainsboro" Command="{Binding WriteToTagCommand}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
@@ -67,10 +68,12 @@
                 </Style>
             </Button.Style>
         </Button>
-
+            <!--#endregion admin header-->
+        
         <ScrollView Grid.Row="1" Grid.ColumnSpan="2">
             <StackLayout Orientation="Vertical" Padding="16,16,16,40" Spacing="10">
 
+                <!--#region singular entries-->
                 <Label Text="Name"  Margin="{StaticResource DistanceLabel}"/>
                 <Entry Text="{Binding CustomerName}" InputTransparent="{Binding Readonly}" MaxLength="20"/>
 
@@ -108,7 +111,8 @@
 
                 <Label Text="Collapsed history"  Margin="{StaticResource DistanceLabel}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}"/>
                 <Entry Text="{Binding CollapsedHistory}" InputTransparent="{Binding Readonly}" IsVisible="{Binding Readonly, Converter={StaticResource InvertBoolConverter}}" Keyboard="Numeric"/>
-
+                <!--#endregion singular entries-->
+                
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -140,7 +144,17 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Entry Text="{Binding Sum}" InputTransparent="{Binding Path=BindingContext.Readonly, Source={x:Reference Name=ReadCardPageName}}" Keyboard="Numeric"/>
-                                    <Label Text="Tycho Dollars from" Grid.Column="1" VerticalTextAlignment="Center"/>
+                                    <Label Text="Tycho Dollars from" Grid.Column="1" VerticalTextAlignment="Center">
+                                        <Label.Style>
+                                            <Style TargetType="{x:Type Label}">
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="{x:Type Label}" Binding="{Binding Sum, Converter={StaticResource IsNegativeConverter}}" Value="True">
+                                                        <Setter Property="Text" Value="Tycho Dollars to"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Label.Style>
+                                    </Label>
                                     <Entry Text="{Binding PartnerByteId}" Grid.Column="2" InputTransparent="{Binding Path=BindingContext.Readonly, Source={x:Reference Name=ReadCardPageName}}" Keyboard="Numeric"/>
                                 </Grid>
                             </ViewCell>

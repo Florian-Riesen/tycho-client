@@ -11,6 +11,7 @@
             <converters:IsEmptyOrNullConverter x:Key="InverseIsEmptyOrNullConverter" Invert="True"/>
             <converters:ByteToIntConverter x:Key="ByteToIntConverter"/>
             <converters:InvertBoolConverter x:Key="InvertBoolConverter"/>
+            <converters:IsNegativeConverter x:Key="IsNegativeConverter"/>
 
 
             <!--Global Styles-->
