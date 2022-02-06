@@ -11,6 +11,8 @@ namespace TychoClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainPage : MasterDetailPage
     {
+        public static MainPage Instance { get; private set; }
+
         Dictionary<int, NavigationPage> MenuPages = new Dictionary<int, NavigationPage>();
         public MainPage()
         {
@@ -20,6 +22,7 @@ namespace TychoClient.Views
             MasterBehavior = MasterBehavior.Popover;
 
             MenuPages.Add((int)MenuItemType.News, (NavigationPage)Detail);
+            Instance = this;
         }
 
         public async Task NavigateFromMenu(int id)

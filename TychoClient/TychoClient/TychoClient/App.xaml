@@ -16,12 +16,6 @@
             <!--Global Styles-->
             <Color x:Key="NavigationPrimary">Orange</Color>
 
-            <Style TargetType="{x:Type NavigationPage}">
-                <Setter Property="BackgroundColor" Value="Black"/>
-                <!--<Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />-->
-                <Setter Property="BarTextColor" Value="Black" />
-                <Setter Property="attached:Attached.HasShadow" Value="True"/>
-            </Style>
 
             <Style TargetType="{x:Type Label}">
                 <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
@@ -44,6 +38,36 @@
 
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Style.Button.Implicit}"/>
 
+            <Style TargetType="{x:Type ContentPage}" x:Key="Style.ContentPage.Default">
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="NavigationPage.HasNavigationBar" Value="False"/>
+                <Setter Property="ControlTemplate">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Grid BackgroundColor="#111109"
+                        ColumnSpacing="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="50" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Button Text="&#x2630;" BackgroundColor="Transparent" FontSize="30" TextColor="Orange"
+                                        attached:Attached.OpensMenu="True" />
+                                <Label Grid.Column="1" Text="{TemplateBinding Title}" TextColor="Orange" Margin="20,0,0,0" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="Large" />
+
+                                <ContentPresenter VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand" BackgroundColor="{TemplateBinding BackgroundColor}"
+                        Grid.Column="0" Grid.ColumnSpan="2"
+                        Grid.Row="1"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

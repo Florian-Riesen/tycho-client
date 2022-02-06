@@ -4,6 +4,7 @@
              x:Class="TychoClient.Views.ReadCardPage"
              xmlns:vm="clr-namespace:TychoClient.ViewModels"
              x:Name="ReadCardPageName"
+             Style="{StaticResource Style.ContentPage.Default}"
              Title="{Binding Title}">
     
     <ContentPage.BindingContext>

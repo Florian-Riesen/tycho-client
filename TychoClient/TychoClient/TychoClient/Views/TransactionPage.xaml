@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TychoClient.Views.TransactionPage"
              xmlns:vm="clr-namespace:TychoClient.ViewModels"
+             Style="{StaticResource Style.ContentPage.Default}"
              Title="{Binding Title}">
     
     <ContentPage.BindingContext>
