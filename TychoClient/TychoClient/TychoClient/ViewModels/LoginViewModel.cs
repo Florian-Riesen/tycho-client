@@ -23,6 +23,14 @@ namespace TychoClient.ViewModels
             set => SetProperty(ref _password, value);
         }
 
+        private bool _isLoggedIn;
+        public bool IsLoggedIn
+        {
+            get => _isLoggedIn;
+            set => SetProperty(ref _isLoggedIn, value);
+        }
+
+
         public ICommand LoginCommand { get; }
 
         public LoginViewModel()
@@ -34,6 +42,12 @@ namespace TychoClient.ViewModels
 
         private void Login()
         {
+            if(IsLoggedIn)
+            {
+                UserName = "";
+                Password = "";
+            }
+            IsLoggedIn = !IsLoggedIn;
             LoginData.Username = UserName;
             LoginData.Password = Password;
             LoginData.IsAdmin = HashStuff.IsAdminPassword(Password);
