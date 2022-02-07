@@ -5,10 +5,22 @@
              xmlns:att="clr-namespace:TychoClient.AttachedProperties"
              Title="Menu" BackgroundColor="#00000000">
 
-    <StackLayout VerticalOptions="FillAndExpand">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <Label x:Name="greetingLabel" FontSize="Large"/>
+
+        <StackLayout Orientation="Horizontal" Grid.Row="2">
+            <Image x:Name="LogoImage" HeightRequest="50"/>
+            <Label Text="TychOS v2.4, &#169; 2335 Tycho Manufacturing and Engineering Concern. All rights reserved."/>
+        </StackLayout>
+        
+        
         <ListView x:Name="ListViewMenu"
-                    HasUnevenRows="True">
+                    HasUnevenRows="True" Grid.Row="1">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell x:Name="ViewCell">
@@ -40,5 +52,12 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-    </StackLayout>
+
+        <!--<Image x:Name="LogoImage" Grid.Row="2"/>-->
+
+        <!--<StackLayout Orientation="Horizontal" Grid.Row="2" BackgroundColor="Red">
+            <Image x:Name="LogoImage"/>
+            <Label Text="TychOS v2.4, &#169; 2335 Tycho Manufacturing and Engineering Concern. All rights reserved."/>
+        </StackLayout>-->
+    </Grid>
 </ContentPage>

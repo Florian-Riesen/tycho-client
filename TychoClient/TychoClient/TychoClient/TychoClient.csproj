@@ -13,6 +13,7 @@
     <None Remove="Fonts\OFL.txt" />
     <None Remove="Fonts\Play-Bold.ttf" />
     <None Remove="Fonts\Play-Regular.ttf" />
+    <None Remove="Resources\tycho_logo_bw.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@
     <EmbeddedResource Include="Fonts\Play-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\tycho_logo_bw.png" />
   </ItemGroup>
 
   <ItemGroup>

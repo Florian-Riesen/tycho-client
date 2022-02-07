@@ -20,6 +20,8 @@ namespace TychoClient.Views
             this.Log("Initializing MenuPage...");
             InitializeComponent();
 
+            LogoImage.Source = ImageSource.FromResource("TychoClient.Resources.tycho_logo_bw.png");
+
             LoginData.UsernameChanged += (s,e) => UpdateGreetingLabel();
             LoginData.AdminStatusChanged += (s, e) => UpdateAdminItems();
             UpdateAdminItems();
