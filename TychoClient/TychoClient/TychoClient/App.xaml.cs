@@ -21,6 +21,7 @@ namespace TychoClient
         protected override void OnStart()
         {
             // Handle when your app starts
+            DataStore.GetInstance().ForceRefreshCache();
         }
 
         protected override void OnSleep()

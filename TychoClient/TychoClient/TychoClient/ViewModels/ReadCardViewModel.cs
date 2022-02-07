@@ -10,8 +10,8 @@ namespace TychoClient.ViewModels
     public class ReadCardViewModel : NfcAwareViewModel
     {
         #region Properties
-        private Transaction _selectedTransaction;
-        public Transaction SelectedTransaction
+        private TransactionUiModel _selectedTransaction;
+        public TransactionUiModel SelectedTransaction
         {
             get => _selectedTransaction;
             set => SetProperty(ref _selectedTransaction, value);
@@ -40,7 +40,7 @@ namespace TychoClient.ViewModels
             get => _chipUid;
             set => SetProperty(ref _chipUid, value);
         }
-		
+
         private string _name;
         public string CustomerName
         {
@@ -76,11 +76,11 @@ namespace TychoClient.ViewModels
             set => SetProperty(ref _checksum, value);
         }
 
-        public ObservableCollection<Transaction> Transactions
+        public ObservableCollection<TransactionUiModel> Transactions
         {
             get;
             set;
-        } = new ObservableCollection<Transaction>();
+        } = new ObservableCollection<TransactionUiModel>();
 
         public string CurrentBalance
         {
@@ -107,13 +107,13 @@ namespace TychoClient.ViewModels
             Title = "Read Card";
             WriteToTagCommand = new Command(Write);
             ClearFormCommand = new Command(ClearForm);
-            AddTransactionCommand = new Command(() => Transactions.Add(new Transaction()));
+            AddTransactionCommand = new Command(() => Transactions.Add(new TransactionUiModel() { NameDb = DataStore.GetInstance().GetUserList() }));
             DeleteTransactionCommand = new Command(DeleteTransaction);
             UpdateReadonly();
-            Transactions.CollectionChanged += (s,e) => OnPropertyChanged(nameof(CurrentBalance));
+            Transactions.CollectionChanged += (s, e) => OnPropertyChanged(nameof(CurrentBalance));
+
         }
 
-        
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
         {
             UpdateReadonly();
@@ -121,10 +121,9 @@ namespace TychoClient.ViewModels
             this.Log("ReadCardVm: Card scanned!");
             if (e.Data is null)
             {
-                this.Log("ReadCardVm: No data in scan!");
+                this.Log("No data in scan!");
                 ClearForm();
                 ChipUid = string.Join(":", e.MetaData.Identifier);
-                this.Log($"ReadCardVm: Read UID {ChipUid} from metadata.");
                 return;
             }
 
@@ -137,12 +136,14 @@ namespace TychoClient.ViewModels
             ChecksumMatches = LoginData.IsAdmin ? (bool?)Enumerable.SequenceEqual(e.Data.Fletcher32Checksum, e.Data.CalculateFletcher32(LoginData.Password)) : null;
             CollapsedHistory = e.Data.CollapsedTransactionHistory.ToString();
             Transactions.Clear();
+            var userList = DataStore.GetInstance().GetUserList();
             foreach (var t in e.Data.Transactions)
-                Transactions.Add(t);
+                Transactions.Add(new TransactionUiModel() { Sum = t.Sum, PartnerByteId = t.PartnerByteId, NameDb = userList});
         }
 
         protected override void OnUserNavigatedHere()
         {
+            DataStore.GetInstance().ForceRefreshCache();
             base.OnUserNavigatedHere();
             ClearForm();
             UpdateReadonly();
@@ -153,7 +154,7 @@ namespace TychoClient.ViewModels
         #region Command Methods
         private void Write()
         {
-            if(IsWriting)
+            if (IsWriting)
             {
                 DataToWrite = null;
                 OnPropertyChanged(nameof(IsWriting));
@@ -172,7 +173,7 @@ namespace TychoClient.ViewModels
             data.CollapsedTransactionHistory = int.TryParse(CollapsedHistory, out int parsedCollapsedHistory) ? parsedCollapsedHistory : 0;
             data.ByteId = byte.TryParse(TransactionId, out byte result) ? result : (byte)0;
             if (Transactions != null)
-                data.Transactions = Transactions.ToList();
+                data.Transactions = Transactions.Select(t => new Transaction() { PartnerByteId = t.PartnerByteId, Sum = t.Sum }).ToList();
 
             data.AvailableAlcoholTokens = byte.TryParse(AvailableDrinks, out byte resDrinks) ? resDrinks : (byte)0;
             data.SpentAlcoholTokens = byte.TryParse(SpentAlcoholTokens, out byte resSpent) ? resSpent : (byte)0;
@@ -207,4 +208,22 @@ namespace TychoClient.ViewModels
 
         #endregion Command Methods
     }
+
+    public class TransactionUiModel : Transaction
+    {
+        public UserList NameDb { get; set; }
+        public string Partner
+        {
+            get => NameDb.FirstOrDefault(e => e.sid == PartnerByteId)?.name ?? PartnerByteId.ToString();
+            set 
+            {
+                if (byte.TryParse(value, out byte parsedSid))
+                    PartnerByteId = parsedSid;
+                else
+                    PartnerByteId = NameDb.FirstOrDefault(e => e.sid == PartnerByteId)?.sid ?? 0;
+            }
+        }
+    }
+
+    
 }

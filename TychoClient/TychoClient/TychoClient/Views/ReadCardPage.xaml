@@ -155,7 +155,7 @@
                                             </Style>
                                         </Label.Style>
                                     </Label>
-                                    <Entry Text="{Binding PartnerByteId}" Grid.Column="2" InputTransparent="{Binding Path=BindingContext.Readonly, Source={x:Reference Name=ReadCardPageName}}" Keyboard="Numeric"/>
+                                    <Entry Text="{Binding Partner}" Grid.Column="2" InputTransparent="{Binding Path=BindingContext.Readonly, Source={x:Reference Name=ReadCardPageName}}" Keyboard="Numeric"/>
                                 </Grid>
                             </ViewCell>
                         </DataTemplate>

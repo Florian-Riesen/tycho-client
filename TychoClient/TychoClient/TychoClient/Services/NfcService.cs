@@ -12,7 +12,7 @@ namespace TychoClient.Services
 {
     public class NfcService
     {
-        private Dictionary<byte[], FreeloaderCustomerData> _emergencyCache = new Dictionary<byte[], FreeloaderCustomerData>();
+        private Dictionary<byte[], FreeloaderCustomerData> _emergencyCache = new Dictionary<byte[], FreeloaderCustomerData>(new ByteArrayComparer());
 
         private static NfcService _instance;
         private List<Byte> _lastPayload;
@@ -150,6 +150,7 @@ namespace TychoClient.Services
             }
             catch (Exception ex)
             {
+                Debugger.Break();
                 this.Log("NFCService: Tag IO Error: " + ex.ToString());
                 this.Log("Possibly the tag just got deleted! Content still in memory.");
                 return false;
@@ -203,5 +204,23 @@ namespace TychoClient.Services
     {
         public FreeloaderCustomerData Data { get; set; }
         public ITagInfo MetaData { get; set; }
+    }
+
+    public class ByteArrayComparer : IEqualityComparer<byte[]>
+    {
+        public bool Equals(byte[] left, byte[] right)
+        {
+            if (left == null || right == null)
+            {
+                return left == right;
+            }
+            return left.SequenceEqual(right);
+        }
+        public int GetHashCode(byte[] key)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+            return key.Sum(b => b);
+        }
     }
 }
