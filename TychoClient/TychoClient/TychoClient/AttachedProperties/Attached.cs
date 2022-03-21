@@ -1,4 +1,5 @@
-﻿using TychoClient.Effects;
+﻿using System.Linq;
+using TychoClient.Effects;
 using TychoClient.Views;
 using Xamarin.Forms;
 
@@ -30,6 +31,11 @@ namespace TychoClient.AttachedProperties
             if (((bool)newValue) && sender is View view)
             {
                 view.Effects.Add(new ShadowEffect());
+            }
+            if (!((bool)newValue) && sender is View view2)
+            {
+                if (view2.Effects.FirstOrDefault(e => e is ShadowEffect) is ShadowEffect effect)
+                    view2.Effects.Remove(effect);
             }
         }
     }

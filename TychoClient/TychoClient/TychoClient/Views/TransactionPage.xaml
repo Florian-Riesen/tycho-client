@@ -13,17 +13,28 @@
     <ContentPage.Resources>
 
         <Style TargetType="{x:Type Button}" x:Key="ButtonStyle" BasedOn="{StaticResource Style.Button.Implicit}">
-            <Setter Property="BackgroundColor" Value="Red"/>
+            <Setter Property="BackgroundColor" Value="DarkRed"/>
             <Setter Property="Text" Value="ABORT TRANSACTION"/>
             <Style.Triggers>
                 <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="WaitingForInput">
                     <Setter Property="Text" Value="Start transaction now"/>
-                    <Setter Property="BackgroundColor" Value="#f37921"/>
+                    <Setter Property="BackgroundColor" Value="Black"/>
                 </DataTrigger>
                 <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="Finished">
                     <Setter Property="Text" Value="Ok"/>
-
-                    <Setter Property="BackgroundColor" Value="Green"/>
+                    <Setter Property="BackgroundColor" Value="DarkGreen"/>
+                </DataTrigger>
+                <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="WaitingForChargee">
+                    <Setter Property="Text" Value="ABORT TRANSACTION"/>
+                    <Setter Property="BackgroundColor" Value="DarkRed"/>
+                </DataTrigger>
+                <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="WaitingForCharger">
+                    <Setter Property="Text" Value="ABORT TRANSACTION"/>
+                    <Setter Property="BackgroundColor" Value="DarkRed"/>
+                </DataTrigger>
+                <DataTrigger TargetType="{x:Type Button}" Binding="{Binding State}" Value="WaitingForFinalization">
+                    <Setter Property="Text" Value="ABORT TRANSACTION"/>
+                    <Setter Property="BackgroundColor" Value="DarkRed"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -41,7 +52,13 @@
 
         <Button Grid.Row="1" Margin="5" Style="{StaticResource ButtonStyle}" Command="{Binding ButtonCommand}"/>
 
-        <Entry Grid.Row="2" Text="{Binding Amount}" Keyboard="Numeric" FontFamily="Play-Regular.ttf#Play" Placeholder="Amount"/>
+        <Entry x:Name="amountEntry" Grid.Row="2" Text="{Binding Amount}" Keyboard="Numeric" FontFamily="Play-Regular.ttf#Play" Placeholder="Amount" InputTransparent="true">
+            <Entry.Triggers>
+                <DataTrigger TargetType="{x:Type Entry}" Binding="{Binding State}" Value="WaitingForInput">
+                    <Setter  Property="InputTransparent" Value="false"/>
+                </DataTrigger>
+            </Entry.Triggers>
+        </Entry>
 
     </Grid>
 </ContentPage>

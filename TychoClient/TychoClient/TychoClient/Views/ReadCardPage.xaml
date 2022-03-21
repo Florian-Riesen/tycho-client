@@ -34,7 +34,7 @@
         </Grid.ColumnDefinitions>
         
         <!--#region admin header-->
-        <Button Text="Write to chip" BackgroundColor="Gainsboro" Command="{Binding WriteToTagCommand}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0">
+        <Button Text="Write to chip" Command="{Binding WriteToTagCommand}" IsEnabled="{Binding ChipUid, Converter={StaticResource InverseIsEmptyOrNullConverter}}" Margin="0">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Style.Triggers>
@@ -53,7 +53,7 @@
                 </Style>
             </Button.Style>
         </Button>
-        <Button Text="Clear" BackgroundColor="Red"  Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0">
+        <Button Text="Clear" BorderColor="Red" Command="{Binding ClearFormCommand}" Grid.Column="1" Margin="0">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Style.Triggers>

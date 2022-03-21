@@ -31,7 +31,7 @@
                                     <Style TargetType="{x:Type Frame}">
                                         <Style.Triggers>
                                             <DataTrigger TargetType="{x:Type Frame}" Binding="{Binding IsSelected}" Value="True">
-                                                <Setter Property="BackgroundColor" Value="#332b12"/>
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Color.ButtonPressed}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

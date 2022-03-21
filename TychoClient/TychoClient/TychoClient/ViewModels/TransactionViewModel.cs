@@ -46,13 +46,12 @@ namespace TychoClient.ViewModels
             set => SetProperty(ref _prompt, value);
         }
 
-        private short _amount;
-        public short Amount
+        private string _amount;
+        public string Amount
         {
             get => _amount;
             set => SetProperty(ref _amount, value);
         }
-
 
         public ICommand ButtonCommand { get; }
 
@@ -72,9 +71,8 @@ namespace TychoClient.ViewModels
             else
             {
                 State = TransactionState.WaitingForInput;
-                Amount = 0;
-            }
-                
+                Amount = null;
+            }   
         }
 
         protected override void OnFreeloaderCardScanned(RfidEventArgs e)
@@ -85,12 +83,13 @@ namespace TychoClient.ViewModels
             {
                 return;
             }
+            short.TryParse(Amount, out short parsedAmount);
 
-            if(_state == TransactionState.WaitingForChargee)
+            if (_state == TransactionState.WaitingForChargee)
             {
                 losingCreditsUid = e.Data.ChipUid;
                 losingCreditsTransactionId = e.Data.ByteId;
-                e.Data.ChargeFromCard(Amount);
+                e.Data.ChargeFromCard(parsedAmount);
                 State = TransactionState.WaitingForCharger;
                 DataToWrite = e.Data;
                 return;
@@ -100,7 +99,7 @@ namespace TychoClient.ViewModels
             {
                 receivingCreditsUid = e.Data.ChipUid;
                 receivingCreditsTransactionId = e.Data.ByteId;
-                e.Data.AddToCard(Amount, losingCreditsTransactionId);
+                e.Data.AddToCard(parsedAmount, losingCreditsTransactionId);
                 State = TransactionState.WaitingForFinalization;
                 DataToWrite = e.Data;
                 return;
@@ -111,7 +110,7 @@ namespace TychoClient.ViewModels
             {
                 e.Data.FinalizeTransaction(receivingCreditsTransactionId);
                 State = TransactionState.Finished;
-                Amount = 0;
+                Amount = null;
                 DataToWrite = e.Data;
                 return;
             }
