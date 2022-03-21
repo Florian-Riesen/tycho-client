@@ -22,6 +22,7 @@ namespace TychoClient.ViewModels
             get => _watcher;
             set
             {
+                bool wasNull = _watcher is null;
                 if (_watcher != null)
                 {
                     _watcher.GotSelected -= _watcher_GotSelected;
@@ -34,14 +35,24 @@ namespace TychoClient.ViewModels
                     _watcher.GotDeselected -= _watcher_GotDeselected;
                     _watcher.GotDeselected += _watcher_GotDeselected;
                 }
+                if (wasNull)
+                    _watcher_GotSelected(this, new EventArgs());
             }
         }
 
+        private IPopupViewModel _currentPopup;
+        public IPopupViewModel CurrentPopup
+        {
+            get => _currentPopup;
+            set => SetProperty(ref _currentPopup, value);
+        }
+
+
         public NfcAwareViewModel()
         {
-             Nfc.FreeloaderCardScanned += Nfc_FreeloaderCardScanned;
+            Nfc.FreeloaderCardScanned += Nfc_FreeloaderCardScanned;
             Nfc.FreeloaderCardWritten += Nfc_FreeloaderCardWritten;
-                
+            //CurrentPopup = PopupService.GetInitialPopup();
         }
 
         private void Nfc_FreeloaderCardWritten(object sender, RfidEventArgs e)
@@ -62,6 +73,7 @@ namespace TychoClient.ViewModels
         private void _watcher_GotSelected(object sender, EventArgs e)
         {
             OnUserNavigatedHere();
+            CurrentPopup = PopupService.RandomlyShowAdvertisement();
         }
 
         protected virtual void OnUserNavigatedHere()

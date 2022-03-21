@@ -3,12 +3,20 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Input;
+using TychoClient.Services;
 using Xamarin.Forms;
 
 namespace TychoClient.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
+        private IPopupViewModel _currentPopup;
+        public IPopupViewModel CurrentPopup
+        {
+            get => _currentPopup;
+            set => SetProperty(ref _currentPopup, value);
+        }
+
         private string _username = "";
         public string UserName
         {
@@ -36,7 +44,7 @@ namespace TychoClient.ViewModels
         public LoginViewModel()
         {
             Title = "Login";
-
+            CurrentPopup = PopupService.GetInitialPopup();
             LoginCommand = new Command(Login);
         }
 

@@ -13,6 +13,7 @@
     <None Remove="Fonts\OFL.txt" />
     <None Remove="Fonts\Play-Bold.ttf" />
     <None Remove="Fonts\Play-Regular.ttf" />
+    <None Remove="Resources\nauvoo_ad.png" />
     <None Remove="Resources\tycho_logo_bw.png" />
   </ItemGroup>
 
@@ -29,6 +30,7 @@
     <EmbeddedResource Include="Fonts\Play-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\nauvoo_ad.png" />
     <EmbeddedResource Include="Resources\tycho_logo_bw.png" />
   </ItemGroup>
 

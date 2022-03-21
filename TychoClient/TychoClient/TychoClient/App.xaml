@@ -2,6 +2,7 @@
 <Application xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:TychoClient.Converters"
+             xmlns:controls="clr-namespace:TychoClient.Controls"  
              xmlns:Effects="clr-namespace:TychoClient.Effects"  
              xmlns:attached="clr-namespace:TychoClient.AttachedProperties"  
              x:Class="TychoClient.App">
@@ -62,9 +63,10 @@
 
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource Style.Button.Implicit}"/>
 
-            <Style TargetType="{x:Type ContentPage}" x:Key="Style.ContentPage.Default">
+            <Style TargetType="{x:Type controls:ContentPageWithPopup}" x:Key="Style.ContentPage.Default">
                 <Setter Property="BackgroundColor" Value="Black"/>
                 <Setter Property="NavigationPage.HasNavigationBar" Value="False"/>
+                <Setter Property="CurrentPopup" Value="{Binding CurrentPopup}"/>
                 <Setter Property="ControlTemplate">
                     <Setter.Value>
                         <ControlTemplate>
@@ -78,6 +80,8 @@
                                     <RowDefinition Height="50" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
+
+
                                 <Button Text="&#x2630;" FontSize="30" TextColor="Orange"  BorderWidth="0" Margin="0,-5,0,0"
                                         attached:Attached.OpensMenu="True" />
                                 <Label Grid.Column="1" Text="{TemplateBinding Title}" TextColor="Orange" Margin="20,0,0,0" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="Large" />
@@ -86,6 +90,32 @@
                         HorizontalOptions="FillAndExpand" BackgroundColor="{TemplateBinding BackgroundColor}"
                         Grid.Column="0" Grid.ColumnSpan="2"
                         Grid.Row="1"/>
+
+
+                                <!--#region Ad popup-->
+                                <!--<Grid Grid.ColumnSpan="2" Grid.RowSpan="2" >-->
+                                
+                                
+                                
+                                    <Grid Grid.ColumnSpan="2" Grid.RowSpan="2"  BackgroundColor="#90000000" BindingContext="{TemplateBinding CurrentPopup}" IsVisible="{Binding IsVisible}">
+                                    <Grid Margin="30" BackgroundColor="#90000000">
+                                            <Image Source="{Binding Image}"/>
+                                        </Grid>
+                                        <Button Text="X" Command="{Binding CloseCommand}" InputTransparent="{Binding CanClose, Converter={StaticResource InvertBoolConverter}}" 
+                                                TextColor="Red" FontSize="Large" Padding="0" Margin="5" BackgroundColor="Black" BorderColor="Red" HorizontalOptions="End" VerticalOptions="Start"/>
+                                    </Grid>
+                                
+                                
+                                
+                                
+                                    <!--<Grid.Triggers>
+                                        <DataTrigger TargetType="{x:Type Grid}" Binding="{TemplateBinding CurrentPopup, Converter={StaticResource IsEmptyOrNullConverter}}" Value="True">
+                                            <Setter Property="IsVisible" Value="False"/>
+                                            <Setter Property="BackgroundColor" Value="Red"/>
+                                        </DataTrigger>
+                                    </Grid.Triggers>
+                                </Grid>-->
+                                <!--#endregion Ad popup-->
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>

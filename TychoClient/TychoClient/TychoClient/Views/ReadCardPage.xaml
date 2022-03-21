@@ -1,10 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<controls:ContentPageWithPopup 
+             xmlns:controls="clr-namespace:TychoClient.Controls"  
+             xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TychoClient.Views.ReadCardPage"
              xmlns:vm="clr-namespace:TychoClient.ViewModels"
              x:Name="ReadCardPageName"
              Style="{StaticResource Style.ContentPage.Default}"
+             CurrentPopup="{Binding CurrentPopup}"
              Title="{Binding Title}">
     
     <ContentPage.BindingContext>
@@ -175,4 +178,4 @@
             </StackLayout>
         </ScrollView>
     </Grid>
-</ContentPage>
+</controls:ContentPageWithPopup>

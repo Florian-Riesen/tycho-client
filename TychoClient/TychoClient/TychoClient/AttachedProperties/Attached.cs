@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using TychoClient.Effects;
+using TychoClient.Services;
 using TychoClient.Views;
 using Xamarin.Forms;
 
@@ -38,5 +39,19 @@ namespace TychoClient.AttachedProperties
                     view2.Effects.Remove(effect);
             }
         }
+
+
+
+        public static IPopupViewModel GetCurrentPopup(BindableObject target) => (IPopupViewModel)target.GetValue(CurrentPopupProperty);
+        public static void SetCurrentPopup(BindableObject target, IPopupViewModel value) => target.SetValue(CurrentPopupProperty, value);
+        public static readonly BindableProperty CurrentPopupProperty =
+                BindableProperty.CreateAttached("CurrentPopup", typeof(IPopupViewModel), typeof(Attached), null, BindingMode.OneWay, null, OnCurrentPopupChanged);
+
+        public static void OnCurrentPopupChanged(BindableObject sender, object oldValue, object newValue)
+        {
+            
+        }
     }
+
+    
 }
