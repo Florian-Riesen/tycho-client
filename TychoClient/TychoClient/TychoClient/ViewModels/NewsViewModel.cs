@@ -20,7 +20,7 @@ namespace TychoClient.ViewModels
         public NewsViewModel()
         {
             Title = "Tycho Station News";
-            CurrentPopup = PopupService.RandomlyShowAdvertisement();
+            CurrentPopup = PopupService.GetInvisiblePopup();
         }
     }
 }

@@ -44,7 +44,7 @@ namespace TychoClient.ViewModels
         public LoginViewModel()
         {
             Title = "Login";
-            CurrentPopup = PopupService.GetInitialPopup();
+            CurrentPopup = PopupService.GetInvisiblePopup();
             LoginCommand = new Command(Login);
         }
 

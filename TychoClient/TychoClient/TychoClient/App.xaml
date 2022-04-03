@@ -19,8 +19,8 @@
             <!--<Color x:Key="NavigationPrimary">Orange</Color>-->
 
             <Color x:Key="Color.ButtonPressed">#332b12</Color>
-            
-            
+
+
             <Style TargetType="{x:Type Label}">
                 <Setter Property="TextColor" Value="LightGoldenrodYellow"/>
                 <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
@@ -33,8 +33,8 @@
                 <Setter Property="attached:Attached.HasShadow" Value="True"/>
                 <Setter Property="PlaceholderColor" Value="DarkGoldenrod"/>
             </Style>
-            
-            
+
+
 
             <Style TargetType="{x:Type Button}" x:Key="Style.Button.Implicit">
                 <Setter Property="FontFamily" Value="Play-Regular.ttf#Play"/>
@@ -93,35 +93,23 @@
 
 
                                 <!--#region Ad popup-->
-                                <!--<Grid Grid.ColumnSpan="2" Grid.RowSpan="2" >-->
-                                
-                                
-                                
-                                    <Grid Grid.ColumnSpan="2" Grid.RowSpan="2"  BackgroundColor="#90000000" BindingContext="{TemplateBinding CurrentPopup}" IsVisible="{Binding IsVisible}">
+                                <Grid Grid.ColumnSpan="2" Grid.RowSpan="2"  BackgroundColor="#90000000" BindingContext="{TemplateBinding CurrentPopup}" IsVisible="{Binding IsVisible}">
                                     <Grid Margin="30" BackgroundColor="#90000000">
-                                            <Image Source="{Binding Image}"/>
-                                        </Grid>
-                                        <Button Text="X" Command="{Binding CloseCommand}" InputTransparent="{Binding CanClose, Converter={StaticResource InvertBoolConverter}}" 
-                                                TextColor="Red" FontSize="Large" Padding="0" Margin="5" BackgroundColor="Black" BorderColor="Red" HorizontalOptions="End" VerticalOptions="Start"/>
+                                        <Image Source="{Binding Image}"/>
                                     </Grid>
-                                
-                                
-                                
-                                
-                                    <!--<Grid.Triggers>
-                                        <DataTrigger TargetType="{x:Type Grid}" Binding="{TemplateBinding CurrentPopup, Converter={StaticResource IsEmptyOrNullConverter}}" Value="True">
-                                            <Setter Property="IsVisible" Value="False"/>
-                                            <Setter Property="BackgroundColor" Value="Red"/>
-                                        </DataTrigger>
-                                    </Grid.Triggers>
-                                </Grid>-->
+                                    <Button Text="X" Command="{Binding CloseCommand}" InputTransparent="{Binding CanClose, Converter={StaticResource InvertBoolConverter}}" 
+                                                TextColor="Red" FontSize="Large" Padding="0" Margin="5" BackgroundColor="Black" BorderColor="Red" HorizontalOptions="End" VerticalOptions="Start"/>
+                                </Grid>
                                 <!--#endregion Ad popup-->
+
                             </Grid>
+
+
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </Style>
-            
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

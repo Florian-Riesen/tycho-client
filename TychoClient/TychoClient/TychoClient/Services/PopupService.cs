@@ -12,7 +12,7 @@ namespace TychoClient.Services
         public static IPopupViewModel RandomlyShowAdvertisement()
         {
             if (new Random().Next(0, 100) > 20)
-                return null;
+                return GetInvisiblePopup();
 
             var newPopup = new PlainImagePopupViewModel();
             newPopup.IsVisible = true;
@@ -23,7 +23,7 @@ namespace TychoClient.Services
             return newPopup;
         }
 
-        public static IPopupViewModel GetInitialPopup() => new PlainImagePopupViewModel() { IsVisible = false };
+        public static IPopupViewModel GetInvisiblePopup() => new PlainImagePopupViewModel() { IsVisible = false };
 
 
         private static ImageSource GetRandomAd()
