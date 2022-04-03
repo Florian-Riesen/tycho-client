@@ -14,6 +14,7 @@
     <None Remove="Fonts\Play-Bold.ttf" />
     <None Remove="Fonts\Play-Regular.ttf" />
     <None Remove="Resources\nauvoo_ad.png" />
+    <None Remove="Resources\protector.gif" />
     <None Remove="Resources\tycho_logo_bw.png" />
   </ItemGroup>
 
@@ -31,6 +32,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\nauvoo_ad.png" />
+    <EmbeddedResource Include="Resources\protector.gif" />
     <EmbeddedResource Include="Resources\tycho_logo_bw.png" />
   </ItemGroup>
 

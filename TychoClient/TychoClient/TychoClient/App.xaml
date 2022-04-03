@@ -95,7 +95,7 @@
                                 <!--#region Ad popup-->
                                 <Grid Grid.ColumnSpan="2" Grid.RowSpan="2"  BackgroundColor="#90000000" BindingContext="{TemplateBinding CurrentPopup}" IsVisible="{Binding IsVisible}">
                                     <Grid Margin="30" BackgroundColor="#90000000">
-                                        <Image Source="{Binding Image}"/>
+                                        <Image Source="{Binding Image}" IsAnimationPlaying="True"/>
                                     </Grid>
                                     <Button Text="X" Command="{Binding CloseCommand}" InputTransparent="{Binding CanClose, Converter={StaticResource InvertBoolConverter}}" 
                                                 TextColor="Red" FontSize="Large" Padding="0" Margin="5" BackgroundColor="Black" BorderColor="Red" HorizontalOptions="End" VerticalOptions="Start"/>

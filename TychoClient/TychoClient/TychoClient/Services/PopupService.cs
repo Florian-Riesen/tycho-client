@@ -9,9 +9,11 @@ namespace TychoClient.Services
 {
     public static class PopupService
     {
+        private static Random _random = new Random();
+
         public static IPopupViewModel RandomlyShowAdvertisement()
         {
-            if (new Random().Next(0, 100) > 20)
+            if (_random.Next(0, 100) > 50)
                 return GetInvisiblePopup();
 
             var newPopup = new PlainImagePopupViewModel();
@@ -26,9 +28,17 @@ namespace TychoClient.Services
         public static IPopupViewModel GetInvisiblePopup() => new PlainImagePopupViewModel() { IsVisible = false };
 
 
-        private static ImageSource GetRandomAd()
+        private static string GetRandomAd()
         {
-            return ImageSource.FromResource("TychoClient.Resources.nauvoo_ad.png");
+            var possibleAdResources = new List<string>();
+            possibleAdResources.Add("nauvoo_ad.png");
+            possibleAdResources.Add("protector.gif");
+            possibleAdResources.Add("hand_model_s.gif");
+            possibleAdResources.Add("human_plus_s.gif");
+            possibleAdResources.Add("the_cube_s.gif");
+            possibleAdResources.Add("vj.gif");
+
+            return possibleAdResources[_random.Next(0, possibleAdResources.Count)];
         }
     }
 
@@ -38,7 +48,7 @@ namespace TychoClient.Services
         bool IsVisible { get; set; }
         bool CanClose { get; set; }
         ICommand CloseCommand { get; set; }
-        ImageSource Image { get; set; }
+        string Image { get; set; }
     }
 
     public class PlainImagePopupViewModel : BaseViewModel, IPopupViewModel
@@ -60,6 +70,6 @@ namespace TychoClient.Services
 
         public ICommand CloseCommand { get; set; }
 
-        public ImageSource Image { get; set; }
+        public string Image { get; set; }
     }
 }
